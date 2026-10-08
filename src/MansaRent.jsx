@@ -1444,9 +1444,9 @@ function TrialBanner() {
   const { t } = useTranslation();
   if (!user) return null;
   if (isSubscribed(user))
-    return <div className="mt-5 flex items-center gap-2 rounded-2xl bg-teal-50 px-4 py-3 text-sm font-semibold text-teal-700 ring-1 ring-teal-100"><Crown size={16} /> {t("trialBanner.active</longcat_think>
-)}</div>
-  );
+    return (
+      <div className="mt-5 flex items-center gap-2 rounded-2xl bg-teal-50 px-4 py-3 text-sm font-semibold text-teal-700 ring-1 ring-teal-100"><Crown size={16} /> {t("trialBanner.active")}</div>
+    );
   const d = daysLeft(user.trialEndsAt);
   return (
     <div className="mt-5 flex flex-col gap-2 rounded-2xl bg-amber-50 px-4 py-3 text-sm text-amber-800 ring-1 ring-amber-200 sm:flex-row sm:items-center sm:justify-between">
@@ -1510,12 +1510,12 @@ export default function MansaRent() {
   useEffect(() => {
     document.documentElement.lang = i18n.language;
     document.title = i18n.language === "fr"
-      ? "MansaRent — Trouvez. Louez. Emménagez. | Location immobilière en Guinée"
-      : "MansaRent — Find. Rent. Move in. | Real estate rentals in Guinea";
+      ? "MansaRent ï¿½ Trouvez. Louez. Emmï¿½nagez. | Location immobiliï¿½re en Guinï¿½e"
+      : "MansaRent ï¿½ Find. Rent. Move in. | Real estate rentals in Guinea";
     const meta = document.querySelector('meta[name="description"]') || document.createElement("meta");
     meta.name = "description";
     meta.content = i18n.language === "fr"
-      ? "MansaRent est la marketplace de location immobilière en Guinée : maisons, appartements, chambres, villas, bureaux et logements de courte durée."
+      ? "MansaRent est la marketplace de location immobiliï¿½re en Guinï¿½e : maisons, appartements, chambres, villas, bureaux et logements de courte durï¿½e."
       : "MansaRent is the rental marketplace in Guinea: houses, apartments, rooms, villas, offices and short-term rentals.";
     document.head.appendChild(meta);
   }, [i18n.language]);
