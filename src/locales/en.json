@@ -1,0 +1,452 @@
+{
+  "nav": {
+    "home": "Home",
+    "properties": "Properties",
+    "shortStay": "Short Stay",
+    "longStay": "Long Stay",
+    "agents": "Agents",
+    "about": "About",
+    "contact": "Contact",
+    "messages": "Messages",
+    "favorites": "Favorites",
+    "login": "Log in",
+    "logout": "Log out",
+    "post": "Post",
+    "postListing": "Post a listing",
+    "menu": "Menu",
+    "close": "Close"
+  },
+  "hero": {
+    "badge": "The #1 rental marketplace in Guinea",
+    "title1": "Find Your",
+    "title2": "Dream",
+    "title3": "Home in Guinea",
+    "subtitle": "Discover houses, apartments, rooms, villas and short-term rentals across Guinea — all in one trusted place.",
+    "slogan": "Find. Rent. Move in.",
+    "find": "Find a home",
+    "post": "Post a listing",
+    "listings": "Listings",
+    "regions": "Regions",
+    "avgRating": "Average rating",
+    "search": {
+      "city": "City",
+      "cityPlaceholder": "Choose a city",
+      "type": "Property type",
+      "typePlaceholder": "Choose a type",
+      "rentalType": "Rental type",
+      "rentalTypePlaceholder": "Choose an option",
+      "search": "Search"
+    }
+  },
+  "categories": {
+    "tag": "Browse by category",
+    "title": "Explore property types",
+    "subtitle": "Whatever your needs, MansaRent has the space for you.",
+    "listings": "listings"
+  },
+  "cities": {
+    "tag": "Popular destinations",
+    "title": "Explore by city",
+    "subtitle": "Find a home in Guinea's largest cities.",
+    "properties": "properties",
+    "inCity": "Homes in {{city}}"
+  },
+  "howItWorks": {
+    "tag": "Simple process",
+    "title": "How MansaRent works",
+    "subtitle": "Three simple steps between you and your next home.",
+    "step1": { "title": "Search properties", "desc": "Filter by city, type and budget to find spaces that match you." },
+    "step2": { "title": "Contact the owner", "desc": "Chat with verified owners through built-in messaging." },
+    "step3": { "title": "Move in", "desc": "Agree on terms, sign and settle in with confidence." }
+  },
+  "whyChoose": {
+    "tag": "Why MansaRent",
+    "title": "Built for tenants in Guinea",
+    "subtitle": "A safer, simpler and smarter way to rent.",
+    "features": {
+      "verified": { "title": "Verified listings", "desc": "Every property is checked before publication." },
+      "trusted": { "title": "Trusted owners", "desc": "Rent from serious and verified owners." },
+      "search": { "title": "Easy search", "desc": "Powerful filters to quickly find the right home." },
+      "messaging": { "title": "Built-in messaging", "desc": "Chat with owners directly in the app." },
+      "safe": { "title": "Safe platform", "desc": "Secure communication protected against fraud." },
+      "payments": { "title": "MansaSend payments", "desc": "Simplified rent and deposits — coming soon." }
+    }
+  },
+  "featured": {
+    "tag": "Selection",
+    "title": "Featured properties",
+    "viewAll": "View all listings"
+  },
+  "forLandlords": {
+    "tag": "For owners & agents",
+    "title": "Post once. Reach everyone.",
+    "subtitle": "Turn your empty spaces into income. MansaRent gives owners the tools to list, manage and rent — quickly.",
+    "benefits": {
+      "reach": { "title": "Reach more tenants", "desc": "Showcase your properties to thousands of active tenants." },
+      "easy": { "title": "Post easily", "desc": "List a property in minutes from your phone." },
+      "visibility": { "title": "Premium visibility", "desc": "Place your listings at the top of search results." },
+      "analytics": { "title": "Analytics dashboard", "desc": "Track views, contacts and performance in real time." }
+    },
+    "cta": "Start posting",
+    "responseTime": "Average response time"
+  },
+  "mansaSend": {
+    "badge": "Coming soon",
+    "title": "Powered by MansaSend",
+    "subtitle": "Soon, pay your rent, deposits and bookings securely right on MansaRent — fast, transparent and protected end to end.",
+    "rentPayment": "Rent payment",
+    "secureDeposits": "Secure deposits",
+    "instantBooking": "Instant booking",
+    "monthly": "Monthly",
+    "paySecurely": "Pay securely",
+    "protectedTransaction": "Protected transaction"
+  },
+  "testimonials": {
+    "tag": "Loved across Guinea",
+    "title": "What our community says"
+  },
+  "propertyCard": {
+    "perMonth": "/month",
+    "beds": "{{count}} bd",
+    "baths": "{{count}} ba",
+    "view": "View",
+    "favorite": "Favorite",
+    "saved": "Saved",
+    "save": "Save"
+  },
+  "listings": {
+    "title": "Available listings",
+    "inCity": "in {{city}}",
+    "inGuinea": "in Guinea",
+    "sort": {
+      "relevance": "Relevance",
+      "priceAsc": "Price: low to high",
+      "priceDesc": "Price: high to low",
+      "newest": "Newest"
+    },
+    "filters": {
+      "allCities": "All cities",
+      "allTypes": "All types",
+      "allRentals": "All rentals",
+      "bedrooms": "Bedrooms",
+      "minPrice": "Min price",
+      "maxPrice": "Max price",
+      "any": "Any",
+      "min": "Min",
+      "max": "Max",
+      "filters": "Filters",
+      "searchPlaceholder": "Search by title, city, neighborhood…",
+      "reset": "Reset filters",
+      "noResults": "No properties found",
+      "noResultsHint": "Try broadening your criteria or resetting the filters."
+    },
+    "backHome": "Back to home"
+  },
+  "detail": {
+    "back": "Back",
+    "verified": "Verified listing",
+    "monthlyRent": "Monthly rent",
+    "description": "Description",
+    "amenities": "Amenities",
+    "bedrooms": "{{count}} bedroom{{countPlural}}",
+    "bathrooms": "{{count}} bathroom{{countPlural}}",
+    "area": "{{area}} m²",
+    "sendMessage": "Send a message",
+    "call": "Call",
+    "protectedVisits": "Exchanges & visits protected by MansaRent",
+    "similar": "Similar properties",
+    "verifiedAgent": "verified",
+    "landlordVerified": "Verified owner",
+    "viewProfile": "View profile",
+    "notFound": "Property not found.",
+    "viewListings": "View listings",
+    "inGuinea": "Guinea",
+    "defaultDescription": "Discover this {{type}} of {{area}} m² ideally located in {{location}}. With {{beds}} bedroom{{bedsPlural}} and {{baths}} bathroom{{bathsPlural}}, this property offers excellent living comfort. Close to shops, schools and main roads — perfect for a {{rentalType}} rental.",
+    "mapAlt": "Map of {{city}}"
+  },
+  "post": {
+    "tag": "Owner space",
+    "title": "Post a listing",
+    "subtitle": "Fill in your property details. It will appear immediately in the listings.",
+    "loginTitle": "Log in to post",
+    "loginSubtitle": "Posting listings is reserved for members. Create an account — the first month is free.",
+    "createAccount": "Create a free account",
+    "trialEndedTitle": "Your free trial has ended",
+    "trialEndedSubtitle": "Subscribe to MansaRent Pro to continue posting — {{price}} per month, no commitment.",
+    "subscribe": "Subscribe — {{price}}/month",
+    "form": {
+      "title": "Listing title",
+      "titlePlaceholder": "E.g. Modern 3-bedroom house in Kipé",
+      "type": "Property type",
+      "rentalType": "Rental type",
+      "city": "City",
+      "neighborhood": "Neighborhood",
+      "neighborhoodPlaceholder": "E.g. Kipé",
+      "rent": "Monthly rent (GNF)",
+      "rentPlaceholder": "E.g. 6200000",
+      "bedrooms": "Bedrooms",
+      "bathrooms": "Bathrooms",
+      "area": "Area (m²)",
+      "areaPlaceholder": "E.g. 180",
+      "phone": "Phone / Mobile",
+      "phonePlaceholder": "+224 6XX XX XX XX",
+      "imageUrl": "Photo URL (optional)",
+      "imageUrlPlaceholder": "https://… (otherwise a default image is used)",
+      "description": "Description",
+      "descriptionPlaceholder": "Describe your property, neighborhood, amenities…",
+      "submit": "Post the listing",
+      "cancel": "Cancel",
+      "terms": "By posting, you agree to our terms of use."
+    },
+    "errors": {
+      "title": "Title required",
+      "price": "Valid price required",
+      "city": "City required",
+      "phone": "Phone required"
+    },
+    "successToast": "Listing published successfully 🎉",
+    "errorToast": "Please correct the fields in red"
+  },
+  "favorites": {
+    "title": "My favorites",
+    "empty": "No favorites yet",
+    "emptyHint": "Tap the heart on a listing to find it here.",
+    "browse": "Browse listings"
+  },
+  "auth": {
+    "loginTab": "Log in",
+    "registerTab": "Sign up",
+    "loginTitle": "Welcome back 👋",
+    "registerTitle": "Create an account",
+    "loginSubtitle": "Log in to continue",
+    "registerSubtitle": "Join MansaRent in seconds",
+    "orEmail": "or by email",
+    "fullName": "Full name",
+    "email": "Email address",
+    "password": "Password",
+    "login": "Log in",
+    "register": "Create my account",
+    "trialNote": "Post a listing: 1 month free, then {{price}}/month",
+    "googleError": "Google login unavailable. Please try again.",
+    "demoUser": "Google User",
+    "continueGoogle": "Continue with Google"
+  },
+  "reviews": {
+    "title": "Reviews & ratings",
+    "yourRating": "Your rating",
+    "shareExperience": "Share your experience…",
+    "publish": "Post my review",
+    "loginPrompt": "Log in to rate and leave a review.",
+    "stars": "{{count}} star{{countPlural}}"
+  },
+  "messages": {
+    "title": "Messages",
+    "subtitle": "Chat live with owners and agents.",
+    "loginTitle": "Log in to chat",
+    "loginSubtitle": "Create a free account to chat with owners and agents directly on MansaRent.",
+    "loginRegister": "Log in / Sign up",
+    "empty": "No conversations",
+    "emptyHint": "Open a listing and tap \"Send a message\" to start a discussion.",
+    "browseListings": "Browse listings",
+    "typeMessage": "Type a message…",
+    "send": "Send",
+    "selectConversation": "Select a conversation",
+    "about": "About: {{title}}",
+    "verified": "Verified"
+  },
+  "payment": {
+    "title": "Payment method",
+    "orangeMoney": "Orange Money",
+    "mtnMoMo": "MTN MoMo",
+    "card": "Card",
+    "orangeLabel": "Orange Money number",
+    "confirmationCode": "Confirmation code",
+    "confirmationCodeHint": "(if requested)",
+    "smsCodePlaceholder": "Code received by SMS / #144#",
+    "momoLabel": "MTN MoMo number",
+    "momoHint": "You will receive a request on your phone: validate with your MoMo PIN.",
+    "cardRedirect": "You will be redirected to a secure page to pay by Visa / Mastercard.",
+    "cardNumber": "Card number",
+    "cardNumberPlaceholder": "4XXX XXXX XXXX XXXX",
+    "expiration": "Expiration",
+    "expirationPlaceholder": "MM/YY",
+    "cvc": "CVC",
+    "cvcPlaceholder": "123",
+    "nameOnCard": "Name on card",
+    "nameOnCardPlaceholder": "Full name",
+    "pay": "Pay {{amount}}",
+    "processing": "Processing…",
+    "secureNote": "Secure payment · no commitment",
+    "notConfirmed": "Payment not confirmed. Please try again.",
+    "error": "Payment error: {{message}}"
+  },
+  "subscribe": {
+    "tag": "Owner subscription",
+    "title": "MansaRent Pro",
+    "subtitle": "Post and manage your listings without limits. 1 month free, then {{price}} per month.",
+    "loginPrompt": "Log in to activate your one-month free trial.",
+    "createAccount": "Create an account",
+    "active": "Active subscription",
+    "activeUntil": "Pro until {{date}} · {{method}}",
+    "perMonth": "/month",
+    "trialRemaining": "Free trial — {{count}} day{{countPlural}} remaining",
+    "planFeatures": {
+      "unlimited": "Unlimited listings",
+      "verifiedBadge": "Verified owner badge",
+      "premiumVisibility": "Premium visibility at the top of results",
+      "unlimitedMessaging": "Unlimited messaging with tenants",
+      "analytics": "Dashboard & statistics"
+    }
+  },
+  "agent": {
+    "memberSince": "Member since {{year}}",
+    "reviews": "reviews",
+    "listings": "listing{{countPlural}}",
+    "listingsTitle": "Their listings",
+    "notFound": "Profile not found."
+  },
+  "trialBanner": {
+    "active": "Pro subscription active — unlimited listings.",
+    "remaining": "Free trial: {{count}} day{{countPlural}} remaining, then {{price}}/month.",
+    "manage": "Manage subscription"
+  },
+  "footer": {
+    "company": "Company",
+    "companyLinks": {
+      "about": "About",
+      "contact": "Contact",
+      "agents": "Agents",
+      "publish": "Post",
+      "subscription": "Subscription"
+    },
+    "tenants": "Tenants",
+    "tenantsLinks": {
+      "search": "Search",
+      "shortStay": "Short stay",
+      "longStay": "Long stay",
+      "messages": "Messages",
+      "favorites": "Favorites"
+    },
+    "legal": "Legal",
+    "legalLinks": {
+      "terms": "Terms",
+      "privacy": "Privacy",
+      "cookies": "Cookies",
+      "trust": "Trust & Safety"
+    },
+    "description": "The rental marketplace in Guinea. Find houses, apartments, rooms, villas and short-term rentals — all in one trusted place.",
+    "slogan": "Find. Rent. Move in.",
+    "browseListings": "Browse listings",
+    "rights": "© 2026 MansaRent. All rights reserved.",
+    "social": {
+      "facebook": "Facebook",
+      "instagram": "Instagram",
+      "tiktok": "TikTok"
+    }
+  },
+  "toast": {
+    "welcome": "Welcome, {{name}}!",
+    "loggedOut": "You have been logged out.",
+    "reviewAdded": "Thank you for your review!",
+    "subscribed": "Subscription activated — welcome to the pros!",
+    "client": "Client"
+  },
+  "chat": {
+    "greeting": "Hello 👋 Thank you for your interest in \"{{title}}\". I'm {{name}}. How can I help you?",
+    "autoReply": "Thank you for your message! I'll get back to you very soon. Would you like to schedule a visit?"
+  },
+  "types": {
+    "Maison": "House",
+    "Appartement": "Apartment",
+    "Chambre": "Room",
+    "Villa": "Villa",
+    "Bureau": "Office",
+    "Boutique": "Shop"
+  },
+  "cities": {
+    "Conakry": "Conakry",
+    "Kankan": "Kankan",
+    "Kindia": "Kindia",
+    "Nzérékoré": "Nzérékoré",
+    "Labé": "Labé",
+    "Mamou": "Mamou",
+    "Boké": "Boké"
+  },
+  "rentalTypes": {
+    "longStay": "Long-term rental",
+    "shortStay": "Short stay"
+  },
+  "amenities": {
+    "Climatisation": "Air conditioning",
+    "Eau courante": "Running water",
+    "Groupe électrogène": "Generator",
+    "Parking": "Parking",
+    "Sécurité 24/7": "24/7 Security",
+    "Internet / Fibre": "Internet / Fiber",
+    "Cuisine équipée": "Equipped kitchen",
+    "Balcon": "Balcony",
+    "Jardin": "Garden",
+    "Meublé": "Furnished",
+    "Piscine": "Pool",
+    "Ascenseur": "Elevator"
+  },
+  "landlordRoles": {
+    "Propriétaire": "Owner",
+    "Agente immobilière": "Real estate agent"
+  },
+  "tags": {
+    "featured": "Featured",
+    "new": "New",
+    "premium": "Premium",
+    "shortStay": "Short stay",
+    "commercial": "Commercial",
+    "furnished": "Furnished",
+    "economical": "Budget-friendly"
+  },
+  "categories": {
+    "Maisons": "Houses",
+    "Appartements": "Apartments",
+    "Chambres": "Rooms",
+    "Villas": "Villas",
+    "Bureaux": "Offices",
+    "Boutiques": "Shops"
+  },
+  "cityCards": {
+    "properties": "{{count}} properties"
+  },
+  "testimonials": {
+    "role1": "Tenant · Conakry",
+    "role2": "Owner · Kankan",
+    "role3": "Agent · Kindia",
+    "text1": "I found my apartment in three days. The built-in messaging made everything fast and simple.",
+    "text2": "I posted two houses and found tenants within a week. The dashboard shows me who's interested.",
+    "text3": "MansaRent gives real visibility to my listings. The verified badges build trust immediately."
+  },
+  "landlordBios": {
+    "bio1": "Owner of several properties in Conakry. Responsive and attentive for peaceful rentals.",
+    "bio2": "Certified agent. I support tenants and owners, from visit to signing.",
+    "bio3": "High-end villas and apartments. Quality and transparency above all.",
+    "bio4": "Specialist in long-term rentals in Guinea. Over 200 families housed."
+  },
+  "seedReviews": {
+    "rv1": "Very professional, visit organized quickly. I recommend.",
+    "rv2": "Beautiful house, well located. Accommodating owner.",
+    "rv3": "Aïssatou found exactly what I was looking for. Perfect.",
+    "rv4": "Magnificent villa, clear and reassuring process.",
+    "rv5": "Very good agent, attentive and honest."
+  },
+  "seedProperties": {
+    "p1": { "title": "Modern 3-bedroom house", "neighborhood": "Kipé" },
+    "p2": { "title": "Bright apartment downtown", "neighborhood": "Kaloum" },
+    "p3": { "title": "Luxury seaside villa", "neighborhood": "Camayenne" },
+    "p4": { "title": "Cozy furnished studio", "neighborhood": "Ratoma" },
+    "p5": { "title": "Office in city center", "neighborhood": "Kaloum" },
+    "p6": { "title": "Family house with garden", "neighborhood": "Centre" },
+    "p7": { "title": "Fully equipped apartment", "neighborhood": "Dixinn" },
+    "p8": { "title": "Villa with private pool", "neighborhood": "Kipé" },
+    "p9": { "title": "Quiet student room", "neighborhood": "Centre" },
+    "p10": { "title": "Madina commercial shop", "neighborhood": "Madina" },
+    "p11": { "title": "Sea view apartment", "neighborhood": "Corniche" },
+    "p12": { "title": "Spacious house in Labé", "neighborhood": "Centre" }
+  }
+}
