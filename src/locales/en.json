@@ -39,37 +39,68 @@
     }
   },
   "categories": {
-    "tag": "Browse by category",
-    "title": "Explore property types",
-    "subtitle": "Whatever your needs, MansaRent has the space for you.",
-    "listings": "listings"
+    "Maisons": "Houses",
+    "Appartements": "Apartments",
+    "Chambres": "Rooms",
+    "Villas": "Villas",
+    "Bureaux": "Offices",
+    "Boutiques": "Shops"
   },
   "cities": {
-    "tag": "Popular destinations",
-    "title": "Explore by city",
-    "subtitle": "Find a home in Guinea's largest cities.",
-    "properties": "properties",
-    "inCity": "Homes in {{city}}"
+    "Conakry": "Conakry",
+    "Kankan": "Kankan",
+    "Kindia": "Kindia",
+    "Nzérékoré": "Nzérékoré",
+    "Labé": "Labé",
+    "Mamou": "Mamou",
+    "Boké": "Boké"
   },
   "howItWorks": {
     "tag": "Simple process",
     "title": "How MansaRent works",
     "subtitle": "Three simple steps between you and your next home.",
-    "step1": { "title": "Search properties", "desc": "Filter by city, type and budget to find spaces that match you." },
-    "step2": { "title": "Contact the owner", "desc": "Chat with verified owners through built-in messaging." },
-    "step3": { "title": "Move in", "desc": "Agree on terms, sign and settle in with confidence." }
+    "step1": {
+      "title": "Search properties",
+      "desc": "Filter by city, type and budget to find spaces that match you."
+    },
+    "step2": {
+      "title": "Contact the owner",
+      "desc": "Chat with verified owners through built-in messaging."
+    },
+    "step3": {
+      "title": "Move in",
+      "desc": "Agree on terms, sign and settle in with confidence."
+    }
   },
   "whyChoose": {
     "tag": "Why MansaRent",
     "title": "Built for tenants in Guinea",
     "subtitle": "A safer, simpler and smarter way to rent.",
     "features": {
-      "verified": { "title": "Verified listings", "desc": "Every property is checked before publication." },
-      "trusted": { "title": "Trusted owners", "desc": "Rent from serious and verified owners." },
-      "search": { "title": "Easy search", "desc": "Powerful filters to quickly find the right home." },
-      "messaging": { "title": "Built-in messaging", "desc": "Chat with owners directly in the app." },
-      "safe": { "title": "Safe platform", "desc": "Secure communication protected against fraud." },
-      "payments": { "title": "MansaSend payments", "desc": "Simplified rent and deposits — coming soon." }
+      "verified": {
+        "title": "Verified listings",
+        "desc": "Every property is checked before publication."
+      },
+      "trusted": {
+        "title": "Trusted owners",
+        "desc": "Rent from serious and verified owners."
+      },
+      "search": {
+        "title": "Easy search",
+        "desc": "Powerful filters to quickly find the right home."
+      },
+      "messaging": {
+        "title": "Built-in messaging",
+        "desc": "Chat with owners directly in the app."
+      },
+      "safe": {
+        "title": "Safe platform",
+        "desc": "Secure communication protected against fraud."
+      },
+      "payments": {
+        "title": "MansaSend payments",
+        "desc": "Simplified rent and deposits — coming soon."
+      }
     }
   },
   "featured": {
@@ -82,10 +113,22 @@
     "title": "Post once. Reach everyone.",
     "subtitle": "Turn your empty spaces into income. MansaRent gives owners the tools to list, manage and rent — quickly.",
     "benefits": {
-      "reach": { "title": "Reach more tenants", "desc": "Showcase your properties to thousands of active tenants." },
-      "easy": { "title": "Post easily", "desc": "List a property in minutes from your phone." },
-      "visibility": { "title": "Premium visibility", "desc": "Place your listings at the top of search results." },
-      "analytics": { "title": "Analytics dashboard", "desc": "Track views, contacts and performance in real time." }
+      "reach": {
+        "title": "Reach more tenants",
+        "desc": "Showcase your properties to thousands of active tenants."
+      },
+      "easy": {
+        "title": "Post easily",
+        "desc": "List a property in minutes from your phone."
+      },
+      "visibility": {
+        "title": "Premium visibility",
+        "desc": "Place your listings at the top of search results."
+      },
+      "analytics": {
+        "title": "Analytics dashboard",
+        "desc": "Track views, contacts and performance in real time."
+      }
     },
     "cta": "Start posting",
     "responseTime": "Average response time"
@@ -102,8 +145,12 @@
     "protectedTransaction": "Protected transaction"
   },
   "testimonials": {
-    "tag": "Loved across Guinea",
-    "title": "What our community says"
+    "role1": "Tenant · Conakry",
+    "role2": "Owner · Kankan",
+    "role3": "Agent · Kindia",
+    "text1": "I found my apartment in three days. The built-in messaging made everything fast and simple.",
+    "text2": "I posted two houses and found tenants within a week. The dashboard shows me who's interested.",
+    "text3": "MansaRent gives real visibility to my listings. The verified badges build trust immediately."
   },
   "propertyCard": {
     "perMonth": "/month",
@@ -363,15 +410,6 @@
     "Bureau": "Office",
     "Boutique": "Shop"
   },
-  "cities": {
-    "Conakry": "Conakry",
-    "Kankan": "Kankan",
-    "Kindia": "Kindia",
-    "Nzérékoré": "Nzérékoré",
-    "Labé": "Labé",
-    "Mamou": "Mamou",
-    "Boké": "Boké"
-  },
   "rentalTypes": {
     "longStay": "Long-term rental",
     "shortStay": "Short stay"
@@ -403,24 +441,8 @@
     "furnished": "Furnished",
     "economical": "Budget-friendly"
   },
-  "categories": {
-    "Maisons": "Houses",
-    "Appartements": "Apartments",
-    "Chambres": "Rooms",
-    "Villas": "Villas",
-    "Bureaux": "Offices",
-    "Boutiques": "Shops"
-  },
   "cityCards": {
     "properties": "{{count}} properties"
-  },
-  "testimonials": {
-    "role1": "Tenant · Conakry",
-    "role2": "Owner · Kankan",
-    "role3": "Agent · Kindia",
-    "text1": "I found my apartment in three days. The built-in messaging made everything fast and simple.",
-    "text2": "I posted two houses and found tenants within a week. The dashboard shows me who's interested.",
-    "text3": "MansaRent gives real visibility to my listings. The verified badges build trust immediately."
   },
   "landlordBios": {
     "bio1": "Owner of several properties in Conakry. Responsive and attentive for peaceful rentals.",
@@ -436,17 +458,166 @@
     "rv5": "Very good agent, attentive and honest."
   },
   "seedProperties": {
-    "p1": { "title": "Modern 3-bedroom house", "neighborhood": "Kipé" },
-    "p2": { "title": "Bright apartment downtown", "neighborhood": "Kaloum" },
-    "p3": { "title": "Luxury seaside villa", "neighborhood": "Camayenne" },
-    "p4": { "title": "Cozy furnished studio", "neighborhood": "Ratoma" },
-    "p5": { "title": "Office in city center", "neighborhood": "Kaloum" },
-    "p6": { "title": "Family house with garden", "neighborhood": "Centre" },
-    "p7": { "title": "Fully equipped apartment", "neighborhood": "Dixinn" },
-    "p8": { "title": "Villa with private pool", "neighborhood": "Kipé" },
-    "p9": { "title": "Quiet student room", "neighborhood": "Centre" },
-    "p10": { "title": "Madina commercial shop", "neighborhood": "Madina" },
-    "p11": { "title": "Sea view apartment", "neighborhood": "Corniche" },
-    "p12": { "title": "Spacious house in Labé", "neighborhood": "Centre" }
+    "p1": {
+      "title": "Modern 3-bedroom house",
+      "neighborhood": "Kipé"
+    },
+    "p2": {
+      "title": "Bright apartment downtown",
+      "neighborhood": "Kaloum"
+    },
+    "p3": {
+      "title": "Luxury seaside villa",
+      "neighborhood": "Camayenne"
+    },
+    "p4": {
+      "title": "Cozy furnished studio",
+      "neighborhood": "Ratoma"
+    },
+    "p5": {
+      "title": "Office in city center",
+      "neighborhood": "Kaloum"
+    },
+    "p6": {
+      "title": "Family house with garden",
+      "neighborhood": "Centre"
+    },
+    "p7": {
+      "title": "Fully equipped apartment",
+      "neighborhood": "Dixinn"
+    },
+    "p8": {
+      "title": "Villa with private pool",
+      "neighborhood": "Kipé"
+    },
+    "p9": {
+      "title": "Quiet student room",
+      "neighborhood": "Centre"
+    },
+    "p10": {
+      "title": "Madina commercial shop",
+      "neighborhood": "Madina"
+    },
+    "p11": {
+      "title": "Sea view apartment",
+      "neighborhood": "Corniche"
+    },
+    "p12": {
+      "title": "Spacious house in Labé",
+      "neighborhood": "Centre"
+    }
+  },
+  "shell": {
+    "signIn": "Sign in",
+    "tabs": {
+      "search": "Search",
+      "favorites": "Favorites",
+      "discover": "Discover",
+      "messages": "Messages",
+      "profile": "Profile"
+    },
+    "menu": {
+      "help": "Help & Support"
+    },
+    "discover": {
+      "title": "Discover",
+      "subtitle": "People and picks to help you move faster",
+      "findAgent": "Find an Agent",
+      "findAgentSub": "Connect with verified agents near you.",
+      "findLandlord": "Find a Landlord",
+      "findLandlordSub": "Directly connect with property owners.",
+      "people": "Agents & landlords",
+      "moreWays": "More ways to discover",
+      "featured": "Featured Properties",
+      "featuredSub": "Handpicked for you",
+      "newListings": "New Listings",
+      "newListingsSub": "Fresh properties in your area",
+      "tips": "Property Tips",
+      "tipsSub": "Learn and get inspired",
+      "viewAll": "View all",
+      "becomeTitle": "Become an agent",
+      "becomeSub": "List properties and earn trust on MansaRent.",
+      "formName": "Full name",
+      "formNamePh": "Enter your full name",
+      "formPhone": "Phone",
+      "formPhonePh": "+224 6XX XX XX XX",
+      "formCity": "City",
+      "formRole": "I am registering as",
+      "roleAgent": "Agent",
+      "roleOwner": "Owner",
+      "formBio": "Short bio (optional)",
+      "formBioPh": "Experience, areas you cover…",
+      "submit": "Register",
+      "formError": "Name and phone are required.",
+      "success": "Welcome aboard, {{name}}! Your agent page is live."
+    },
+    "profile": {
+      "loginTitle": "Your account",
+      "loginSubtitle": "Sign in to manage listings, messages and alerts.",
+      "saved": "Saved Properties",
+      "notifications": "Notifications",
+      "language": "Language",
+      "help": "Help & Support",
+      "signOut": "Sign Out"
+    },
+    "notifs": {
+      "chat": "Chat",
+      "notifs": "Notifications",
+      "empty": "No notifications yet",
+      "emptyHint": "Price drops, new messages and viewing activity will appear here.",
+      "seedMsg": "New message",
+      "seedMsgText": "{{name}} sent you a message",
+      "seedPrice": "Price drop",
+      "seedPriceText": "Price reduced on 3 properties you viewed",
+      "seedFav": "Saved",
+      "seedFavText": "You saved a property in Kipé",
+      "seedViews": "Listing activity",
+      "seedViewsText": "Your property received 12 new views"
+    },
+    "stats": {
+      "views": "views",
+      "saves": "saved",
+      "daysOn": "days on MansaRent",
+      "updated": "Updated",
+      "lastActive": "Active {{when}}"
+    },
+    "install": {
+      "title": "Install MansaRent",
+      "sub": "Faster access, works offline",
+      "btn": "Install",
+      "dismiss": "Not now"
+    },
+    "favTabs": {
+      "properties": "Properties",
+      "agents": "Agents"
+    },
+    "admin": {
+      "title": "Administration",
+      "subtitle": "APIs, content and images — no redeploy needed.",
+      "needBackend": "Connect the backend (VITE_API_URL) to manage the site.",
+      "needRole": "Restricted to administrator accounts.",
+      "tabs": {
+        "integrations": "APIs",
+        "content": "Content"
+      },
+      "enabled": "Enabled",
+      "save": "Save",
+      "saved": "Saved",
+      "error": "Save failed.",
+      "integSubtitle": "Keys are encrypted and override the .env file instantly.",
+      "secretSet": "set",
+      "secretEmpty": "empty",
+      "announcement": "Announcement banner",
+      "annFr": "Text (French)",
+      "annEn": "Text (English)",
+      "heroImage": "Hero image",
+      "upload": "Upload an image",
+      "uploading": "Uploading…",
+      "categories": "Category images",
+      "contact": "Contact info",
+      "phone": "Phone",
+      "email": "Email",
+      "viewSite": "Apply and view"
+    }
   }
 }

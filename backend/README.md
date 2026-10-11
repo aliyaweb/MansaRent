@@ -43,6 +43,31 @@ Vérifiez : `GET http://localhost:4000/api/health` → `{"ok":true}`.
 - **Supabase** : https://supabase.com → nouveau projet → Settings → Database → Connection string
 - Collez-la dans `backend/.env` : `DATABASE_URL=postgresql://...`
 
+### Via Netlify DB (recommandé si le frontend est sur Netlify)
+
+Netlify DB est un Postgres **Neon** géré depuis Netlify — une seule base pour
+tout le projet :
+
+1. Netlify Dashboard → votre site → **Storage** (ou l'onglet **Data**) →
+   **Connect database** / **Create database** → nommez-la (ex. `mansarent-db`).
+2. Une fois créée : **Settings / Connect** → copiez la **connection string**
+   (prenez la version *pooled* `…-pooler…` pour l'API, la version *direct*
+   pour les migrations si besoin).
+3. Collez-la comme `DATABASE_URL` :
+   - en local : `backend/.env` → `DATABASE_URL=postgresql://…`
+   - en hébergement backend (Railway/Render/Fly) : même valeur dans les
+     variables d'environnement du service.
+   - Netlify n'a PAS besoin de cette variable (le frontend ne parle à la base
+     qu'à travers votre API).
+4. Appliquez le schéma puis seed :
+   ```bash
+   cd backend
+   npx prisma db push   # crée les tables (Integration, SiteSetting incluses)
+   npm run seed         # admin + annonces de démo
+   ```
+5. Vérifiez : `GET http://localhost:4000/api/health` → `{"ok":true}`,
+   puis `GET /api/settings` → réglages par défaut.
+
 ## E-mails (ZeptoMail)
 
 1. https://www.zoho.com/zeptomail → créez un compte → vérifiez votre domaine

@@ -16,6 +16,8 @@ import agentRoutes from "./routes/agents.js";
 import subscriptionRoutes from "./routes/subscriptions.js";
 import webhookRoutes from "./routes/webhooks.js";
 import adminRoutes from "./routes/admin.js";
+import settingsRoutes from "./routes/settings.js";
+import { syncIntegrationsToEnv } from "./lib/integrations.js";
 
 const app = express();
 app.use(cors({ origin: process.env.APP_URL?.split(",") || true }));
@@ -35,6 +37,7 @@ app.use("/api/agents", agentRoutes);
 app.use("/api/subscriptions", subscriptionRoutes);
 app.use("/api/webhooks", webhookRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/settings", settingsRoutes); // public : ajustements frontend pilotés par l'admin
 
 // ---- 404 ---------------------------------------------------
 app.use("/api", (_req, res) => res.status(404).json({ error: "Route introuvable" }));
@@ -47,4 +50,8 @@ app.use((err, _req, res, _next) => {
 });
 
 const PORT = Number(process.env.PORT || 4000);
-app.listen(PORT, () => console.log(`MansaRent backend → http://localhost:${PORT}`));
+app.listen(PORT, () => {
+  console.log(`MansaRent backend → http://localhost:${PORT}`);
+  // Les clés saisies dans l'admin (chiffrées en base) prennent le pas sur le .env.
+  syncIntegrationsToEnv().catch((e) => console.warn("[integrations] sync au démarrage :", e.message));
+});

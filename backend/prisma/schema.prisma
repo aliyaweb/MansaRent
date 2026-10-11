@@ -37,7 +37,6 @@ model User {
   properties       Property[]
   favorites        Favorite[]
   sentMessages     Message[]  @relation("MessageSender")
-  reviews          Review[]
   subscriptions    Subscription[]
   payments         Payment[]
 
@@ -203,4 +202,22 @@ model Payment {
 
   @@index([userId])
   @@index([status])
+}
+
+// ---- Admin-managed integrations & site content --------------------
+// Les clés API saisies dans l'admin sont chiffrées (AES-256-GCM, voir
+// lib/secrets.js) et PRIORITAIRES sur les variables d'environnement.
+// Réglages du site (annonce, images, contact) consommés par le frontend.
+
+model Integration {
+  provider  String   @id // cinetpay | hub2 | orange | mtnmomo | zeptomail | r2 | google | custom_*
+  enabled   Boolean  @default(false)
+  config    String   @db.Text // JSON chiffré { ENV_VAR: valeur }
+  updatedAt DateTime @updatedAt
+}
+
+model SiteSetting {
+  key       String   @id // announcement | hero | categories | contact
+  value     Json
+  updatedAt DateTime @updatedAt
 }

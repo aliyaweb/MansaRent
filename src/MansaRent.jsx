@@ -6,9 +6,10 @@ import {
   Star, Facebook, Instagram, ArrowRight, ArrowLeft, Sparkles, Check,
   TrendingUp, Eye, Heart, Phone, ChevronRight, SlidersHorizontal,
   ImagePlus, Maximize2, User, LogOut, Plus, Mail, Lock, Square,
-  MessageSquare, Send, CreditCard, Smartphone, Clock, Crown, BadgeCheck
+  MessageSquare, Send, CreditCard, Smartphone, Clock, Crown, BadgeCheck,
+  Bell, Compass, CircleUserRound, Download, History, Settings, LifeBuoy, Activity
 } from "lucide-react";
-import { PaymentAPI } from "./services/api.js";
+import { PaymentAPI, SettingsAPI, AdminAPI } from "./services/api.js";
 
 const VILLES_KEYS = ["Conakry", "Kankan", "Kindia", "Nzérékoré", "Labé", "Mamou", "Boké"];
 const TYPES_KEYS = ["Maison", "Appartement", "Chambre", "Villa", "Bureau", "Boutique"];
@@ -65,6 +66,10 @@ const formatGNF = (n) => {
   return `${n} GNF`;
 };
 const landlordOf = (p) => p.landlordInfo || LANDLORDS[p.landlord ?? 0] || LANDLORDS[0];
+// Seed agents use i18n keys (roleKey/cityKey/bioKey); registered agents use plain strings.
+const dispRole = (a, t) => (a.roleKey ? t(a.roleKey) : a.role || "");
+const dispCity = (a, t) => (a.cityKey ? t(a.cityKey) : a.city || "");
+const dispBio = (a, t) => (a.bioKey ? t(a.bioKey) : a.bio || "");
 const galleryOf = (p) => (p.images && p.images.length ? p.images : imgs(p.type, 1000));
 const coverOf = (p) => (p.images && p.images.length ? p.images[0] : url(POOL[p.type][0], 800));
 
@@ -77,6 +82,30 @@ const inTrial = (u) => !!(u && u.trialEndsAt && u.trialEndsAt > Date.now());
 const canPost = (u) => !!u && (isSubscribed(u) || inTrial(u));
 const fmtDate = (ts) => new Date(ts).toLocaleDateString("fr-FR", { day: "2-digit", month: "long", year: "numeric" });
 const agentOf = (p) => (typeof p.landlord === "number" ? p.landlord : null);
+
+// ---- PWA app-shell helpers (deterministic demo stats per listing) ----
+const statSeed = (id) => { const n = Number(id) || 1; return { views: 80 + ((n * 137) % 900), saves: 3 + ((n * 41) % 60), daysOn: 2 + ((n * 29) % 45), activeH: 1 + ((n * 7) % 20) }; };
+const relTime = (ts, lang = "fr") => {
+  const m = Math.max(1, Math.round((Date.now() - ts) / 60000));
+  if (lang === "fr") {
+    if (m < 60) return `il y a ${m} min`;
+    const h = Math.round(m / 60);
+    if (h < 24) return `il y a ${h} h`;
+    const d = Math.round(h / 24);
+    return d === 1 ? "hier" : `il y a ${d} jours`;
+  }
+  if (m < 60) return `${m}m ago`;
+  const h = Math.round(m / 60);
+  if (h < 24) return `${h}h ago`;
+  const d = Math.round(h / 24);
+  return d === 1 ? "yesterday" : `${d}d ago`;
+};
+const SEED_NOTIFICATIONS = [
+  { id: "n1", icon: "message", titleKey: "shell.notifs.seedMsg", textKey: "shell.notifs.seedMsgText", agentIdx: 0, ts: Date.now() - 24 * 60000, read: false },
+  { id: "n2", icon: "price", titleKey: "shell.notifs.seedPrice", textKey: "shell.notifs.seedPriceText", ts: Date.now() - 26 * 3600000, read: false },
+  { id: "n3", icon: "heart", titleKey: "shell.notifs.seedFav", textKey: "shell.notifs.seedFavText", ts: Date.now() - 3 * 86400000, read: true },
+  { id: "n4", icon: "eye", titleKey: "shell.notifs.seedViews", textKey: "shell.notifs.seedViewsText", ts: Date.now() - 5 * 86400000, read: true },
+];
 
 const AppCtx = createContext(null);
 const useApp = () => useContext(AppCtx);
@@ -146,14 +175,14 @@ function Avatar({ name = "?", src = null, size = 36, className = "" }) {
   );
 }
 
-function Logo({ light = false }) {
+function Logo({ light = false, compact = false }) {
   const { navigate } = useApp();
   return (
-    <button onClick={() => navigate("home")} className="flex items-center gap-2.5 select-none">
-      <span className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-teal-600 to-teal-800 text-white shadow-md shadow-teal-700/30">
-        <Home size={18} strokeWidth={2.5} />
+    <button onClick={() => navigate("home")} className={`flex shrink-0 items-center select-none ${compact ? "gap-1.5" : "gap-2.5"}`}>
+      <span className={`grid place-items-center rounded-xl bg-gradient-to-br from-teal-600 to-teal-800 text-white shadow-md shadow-teal-700/30 ${compact ? "h-7 w-7 rounded-lg" : "h-9 w-9"}`}>
+        <Home size={compact ? 15 : 18} strokeWidth={2.5} />
       </span>
-      <span className={`mr-display text-xl font-extrabold ${light ? "text-white" : "text-gray-900"}`}>Mansa<span className="text-amber-500">Rent</span></span>
+      <span className={`mr-display font-extrabold ${light ? "text-white" : "text-gray-900"} ${compact ? "text-base" : "text-xl"}`}>Mansa<span className="text-amber-500">Rent</span></span>
     </button>
   );
 }
@@ -328,8 +357,9 @@ function SearchBar({ big = true }) {
 }
 
 function Hero() {
-  const { setFilters, navigate } = useApp();
+  const { setFilters, navigate, siteSettings } = useApp();
   const { t } = useTranslation();
+  const heroImg = (siteSettings?.hero?.image) || url("photo-1545324418-cc1a3fa10c00", 900);
   return (
     <section id="accueil" className="relative overflow-hidden bg-gradient-to-b from-teal-50/70 via-white to-white pt-8 lg:pt-14">
       <div className="pointer-events-none absolute -left-24 top-10 h-72 w-72 rounded-full bg-teal-200/40 blur-3xl mr-blob" />
@@ -362,7 +392,7 @@ function Hero() {
         <Reveal delay={200} className="relative">
           <div className="relative mr-float">
             <div className="overflow-hidden rounded-[32px] shadow-2xl shadow-teal-900/20 ring-1 ring-black/5">
-              <img loading="eager" alt={t("hero.title3")} src={url("photo-1545324418-cc1a3fa10c00", 900)} className="h-[360px] w-full object-cover sm:h-[460px]" />
+              <img loading="eager" alt={t("hero.title3")} src={heroImg} className="h-[360px] w-full object-cover sm:h-[460px]" />
             </div>
             <div className="absolute -bottom-5 -left-3 hidden rounded-2xl bg-white p-3.5 shadow-xl ring-1 ring-gray-100 sm:block">
               <div className="flex items-center gap-3">
@@ -392,9 +422,10 @@ const CATEGORIES = [
 ];
 
 function Categories() {
-  const { setFilters, navigate } = useApp();
+  const { setFilters, navigate, siteSettings } = useApp();
   const { t } = useTranslation();
   const go = (type) => { setFilters({ ...EMPTY_FILTERS, type }); navigate("listings"); };
+  const imgOf = (c) => (siteSettings?.categories?.[c.type]) || c.img;
   return (
     <section id="proprietes" className="mx-auto max-w-7xl px-5 py-16 lg:px-8 lg:py-24">
       <Reveal className="mb-10 text-center">
@@ -407,7 +438,7 @@ function Categories() {
           <Reveal key={c.nameKey} delay={i * 70}>
             <button onClick={() => go(c.type)} className="group block w-full overflow-hidden rounded-3xl bg-white text-left shadow-sm ring-1 ring-gray-100 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:ring-teal-200">
               <div className="relative h-28 overflow-hidden bg-gray-100">
-                <img loading="lazy" alt={t(c.nameKey)} src={c.img} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                <img loading="lazy" alt={t(c.nameKey)} src={imgOf(c)} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" />
                 <span className="absolute left-2.5 top-2.5 grid h-9 w-9 place-items-center rounded-xl bg-white/95 text-teal-700 shadow-sm backdrop-blur"><c.icon size={18} /></span>
               </div>
               <div className="px-3.5 py-3"><div className="mr-display font-bold text-gray-900">{t(c.nameKey)}</div><div className="text-xs font-medium text-gray-400">{c.count} {t("categories.listings")}</div></div>
@@ -752,12 +783,17 @@ function ListingsPage() {
 }
 
 function DetailPage() {
-  const { route, properties, favorites, toggleFavorite, navigate, back, user, openAuth, startConversation, reviews } = useApp();
+  const { route, properties, favorites, toggleFavorite, navigate, back, user, openAuth, startConversation, reviews, i18n } = useApp();
   const { t } = useTranslation();
   const p = properties.find((x) => x.id === route.id);
   const gallery = useMemo(() => (p ? galleryOf(p) : []), [p]);
   const [active, setActive] = useState(0);
   useEffect(() => { setActive(0); }, [route.id]);
+  useEffect(() => {
+    if (gallery.length < 2) return;
+    const id = setInterval(() => setActive((a) => (a + 1) % gallery.length), 4000);
+    return () => clearInterval(id);
+  }, [gallery.length, route.id]);
   if (!p) return <div className="mx-auto max-w-3xl px-5 py-24 text-center"><p className="text-gray-500">{t("detail.notFound")}</p><Btn variant="ghost" className="mt-4 px-5 py-2.5" onClick={() => navigate("listings")}>{t("detail.viewListings")}</Btn></div>;
 
   const ll = landlordOf(p);
@@ -777,6 +813,14 @@ function DetailPage() {
             <img alt={t(p.titleKey)} src={gallery[active]} className="h-[280px] w-full object-cover sm:h-[440px]" />
             {p.tagKey && <span className="absolute left-4 top-4 rounded-full bg-amber-500 px-3 py-1 text-xs font-bold text-white shadow">{t(p.tagKey)}</span>}
             <span className="absolute bottom-4 left-4 flex items-center gap-1.5 rounded-full bg-white/95 px-3 py-1.5 text-xs font-semibold text-teal-700 shadow backdrop-blur"><ShieldCheck size={14} /> {t("detail.verified")}</span>
+            {gallery.length > 1 && (
+              <>
+                <span className="absolute bottom-4 right-4 rounded-full bg-gray-900/70 px-2.5 py-1 text-xs font-bold text-white backdrop-blur">{active + 1}/{gallery.length}</span>
+                <span className="absolute bottom-4 left-1/2 flex -translate-x-1/2 gap-1.5">
+                  {gallery.map((_, i) => (<span key={i} className={`h-1.5 rounded-full transition-all ${i === active ? "w-5 bg-white" : "w-1.5 bg-white/60"}`} />))}
+                </span>
+              </>
+            )}
           </div>
           <div className="grid grid-cols-3 gap-3 lg:grid-cols-2">
             {gallery.slice(0, 4).map((g, i) => (
@@ -802,6 +846,7 @@ function DetailPage() {
                 <div key={i} className="flex items-center gap-2 rounded-2xl bg-gray-50 px-4 py-3 ring-1 ring-gray-100"><Ic size={18} className="text-teal-600" /><span className="text-sm font-semibold text-gray-700">{label}</span></div>
               ))}
             </div>
+            <ListingStats id={p.id} />
             <div className="mt-8">
               <h2 className="mr-display text-xl font-bold text-gray-900">{t("detail.description")}</h2>
               <p className="mt-3 leading-relaxed text-gray-600">{p.description || t("detail.defaultDescription", { type: t(`types.${p.type}`).toLowerCase(), area: p.area, location: p.neighborhood ? p.neighborhood + ", " : "", beds: p.beds, bedsPlural: p.beds > 1 ? "s" : "", baths: p.baths, bathsPlural: p.baths > 1 ? "s" : "", rentalType: t(p.rentalTypeKey).toLowerCase() })}</p>
@@ -828,6 +873,7 @@ function DetailPage() {
                 <div className="flex-1">
                   <div className="mr-display font-bold text-gray-900">{ll.name}</div>
                   <div className="flex items-center gap-1 text-xs text-gray-500"><BadgeCheck size={13} className="text-teal-600" /> {agentId != null ? `${t(ll.roleKey)} ${t("detail.verifiedAgent")}` : t("detail.landlordVerified")}</div>
+                  <div className="mt-1 flex items-center gap-1.5 text-xs text-gray-500"><span className="h-2 w-2 rounded-full bg-teal-500" />{t("shell.stats.lastActive", { when: relTime(Date.now() - statSeed(p.id).activeH * 3600000, i18n.language) })}</div>
                 </div>
                 {agentId != null && agentReviews.length > 0 && <Stars value={agentRating} size={14} />}
               </button>
@@ -958,15 +1004,42 @@ function PostPage() {
 }
 
 function FavoritesPage() {
-  const { properties, favorites, navigate, setFilters } = useApp();
+  const { properties, favorites, navigate, setFilters, startConversation, user, openAuth, agents } = useApp();
   const { t } = useTranslation();
+  const [tab, setTab] = useState("properties");
   const list = properties.filter((p) => favorites.includes(p.id));
+  const contactAgent = (idx) => {
+    if (!user) return openAuth();
+    const p = properties.find((x) => agentOf(x) === idx);
+    if (p) { const cid = startConversation(p); navigate("messages", { conv: cid }); }
+    else navigate("agent", { id: idx });
+  };
   return (
     <div className="min-h-screen bg-gray-50/70">
       <div className="mx-auto max-w-7xl px-5 py-10 lg:px-8 lg:py-14">
         <button onClick={() => navigate("home")} className="mb-5 inline-flex items-center gap-2 text-sm font-semibold text-gray-600 hover:text-teal-700"><ArrowLeft size={16} /> {t("detail.back")}</button>
         <h1 className="mr-display text-2xl font-extrabold text-gray-900 sm:text-3xl">{t("favorites.title")} <Heart className="ml-1 inline text-rose-500" size={22} fill="currentColor" /></h1>
-        <p className="mt-1 text-sm text-gray-500">{list.length} {t("favorites.empty")}</p>
+        <div className="mt-5 flex gap-6 border-b border-gray-200">
+          {(["properties", "agents"]).map((k) => (
+            <button key={k} onClick={() => setTab(k)} className={`relative pb-3 text-sm font-bold ${tab === k ? "text-teal-700" : "text-gray-400 hover:text-gray-600"}`}>
+              {t(`shell.favTabs.${k}`)}
+              {tab === k && <span className="absolute inset-x-0 -bottom-px h-0.5 rounded-full bg-teal-700" />}
+            </button>
+          ))}
+        </div>
+        {tab === "agents" ? (
+          <div className="mt-6 overflow-hidden rounded-3xl bg-white ring-1 ring-gray-100">
+            {agents.map((a, i) => (
+              <div key={i} className="flex items-center gap-3 border-b border-gray-50 px-4 py-3.5 last:border-0">
+                <button onClick={() => navigate("agent", { id: i })} className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-teal-700 text-sm font-bold text-white">{a.name.charAt(0)}</button>
+                <button onClick={() => navigate("agent", { id: i })} className="min-w-0 flex-1 text-left"><span className="mr-display block truncate font-bold text-gray-900">{a.name}</span><span className="block truncate text-xs text-gray-500">{dispRole(a, t)} · {dispCity(a, t)}</span></button>
+                <button onClick={() => contactAgent(i)} className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-teal-50 text-teal-700 hover:bg-teal-100" aria-label={t("detail.sendMessage")}><MessageSquare size={17} /></button>
+              </div>
+            ))}
+          </div>
+        ) : (
+        <>
+        <p className="mt-4 text-sm text-gray-500">{list.length} {t("favorites.empty")}</p>
         {list.length === 0 ? (
           <div className="mt-12 flex flex-col items-center rounded-3xl bg-white py-16 text-center ring-1 ring-gray-100">
             <span className="grid h-16 w-16 place-items-center rounded-full bg-rose-50 text-rose-400"><Heart size={28} /></span>
@@ -976,6 +1049,8 @@ function FavoritesPage() {
           </div>
         ) : (
           <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">{list.map((p, i) => <PropertyCard key={p.id} p={p} delay={i * 60} />)}</div>
+        )}
+        </>
         )}
       </div>
     </div>
@@ -1182,10 +1257,12 @@ function ReviewsBlock({ propertyId = null, agentId = null }) {
 }
 
 function MessagesPage() {
-  const { conversations, sendMessage, markConversationRead, route, navigate, user, openAuth } = useApp();
+  const { conversations, sendMessage, markConversationRead, route, navigate, user, openAuth, notifications } = useApp();
   const { t } = useTranslation();
   const [activeId, setActiveId] = useState(route.conv || conversations[0]?.id || null);
   const [draft, setDraft] = useState("");
+  const [tab, setTab] = useState("chat");
+  const unreadNotifs = notifications.filter((n) => !n.read).length;
   const endRef = useRef(null);
   useEffect(() => { if (route.conv) setActiveId(route.conv); }, [route.conv]);
   const active = conversations.find((c) => c.id === activeId) || null;
@@ -1212,6 +1289,16 @@ function MessagesPage() {
       <div className="mx-auto max-w-6xl px-5 py-8 lg:px-8 lg:py-12">
         <h1 className="mr-display text-2xl font-extrabold text-gray-900 sm:text-3xl">{t("messages.title")}</h1>
         <p className="mt-1 text-sm text-gray-500">{t("messages.subtitle")}</p>
+        <div className="mt-5 grid grid-cols-2 gap-1 rounded-full bg-gray-100 p-1">
+          {(["chat", "notifs"]).map((k) => (
+            <button key={k} onClick={() => setTab(k)} className={`flex items-center justify-center gap-2 rounded-full py-2.5 text-sm font-bold transition ${tab === k ? "bg-teal-700 text-white shadow" : "text-gray-500 hover:text-gray-700"}`}>
+              {t(`shell.notifs.${k}`)}
+              {k === "notifs" && unreadNotifs > 0 && <span className={`grid h-5 min-w-5 place-items-center rounded-full px-1 text-[10px] font-extrabold ${tab === k ? "bg-amber-500 text-teal-900" : "bg-amber-500 text-teal-900"}`}>{unreadNotifs}</span>}
+            </button>
+          ))}
+        </div>
+        {tab === "notifs" ? <NotificationsList /> : (
+        <>
         {conversations.length === 0 ? (
           <div className="mt-8 flex flex-col items-center rounded-3xl bg-white py-16 text-center ring-1 ring-gray-100">
             <span className="grid h-16 w-16 place-items-center rounded-full bg-teal-50 text-teal-700"><MessageSquare size={28} /></span>
@@ -1261,6 +1348,8 @@ function MessagesPage() {
               )}
             </div>
           </div>
+        )}
+        </>
         )}
       </div>
     </div>
@@ -1400,10 +1489,10 @@ function SubscribePage() {
 }
 
 function AgentProfilePage() {
-  const { route, properties, navigate, reviews } = useApp();
+  const { route, properties, navigate, reviews, agents } = useApp();
   const { t } = useTranslation();
   const id = route.id;
-  const agent = LANDLORDS[id];
+  const agent = agents[id];
   const listings = properties.filter((p) => agentOf(p) === id);
   const agentReviews = reviews.filter((r) => r.agentId === id);
   const avg = agentReviews.length ? agentReviews.reduce((s, r) => s + r.rating, 0) / agentReviews.length : 0;
@@ -1417,13 +1506,13 @@ function AgentProfilePage() {
             <span className="grid h-20 w-20 shrink-0 place-items-center rounded-3xl bg-gradient-to-br from-teal-600 to-teal-800 text-2xl font-extrabold text-white">{agent.name.charAt(0)}</span>
             <div className="flex-1">
               <div className="flex items-center gap-2"><h1 className="mr-display text-2xl font-extrabold text-gray-900">{agent.name}</h1><BadgeCheck size={20} className="text-teal-600" /></div>
-              <p className="mt-1 text-sm text-gray-500">{t(agent.roleKey)} · {t(agent.cityKey)} · {t("agent.memberSince", { year: agent.since })}</p>
+              <p className="mt-1 text-sm text-gray-500">{dispRole(agent, t)} · {dispCity(agent, t)} · {t("agent.memberSince", { year: agent.since })}</p>
               <div className="mt-3 flex flex-wrap items-center gap-3">
                 <span className="flex items-center gap-2"><Stars value={avg} /> <span className="text-sm font-semibold text-gray-700">{avg ? avg.toFixed(1) : "—"}</span> <span className="text-sm text-gray-400">({agentReviews.length} {t("agent.reviews")})</span></span>
                 <span className="text-gray-300">·</span>
                 <span className="text-sm font-semibold text-teal-700">{listings.length} {t("agent.listings", { countPlural: listings.length > 1 ? "s" : "" })}</span>
               </div>
-              {agent.bioKey && <p className="mt-3 max-w-xl text-sm text-gray-600">{t(agent.bioKey)}</p>}
+              {dispBio(agent, t) && <p className="mt-3 max-w-xl text-sm text-gray-600">{dispBio(agent, t)}</p>}
             </div>
           </div>
         </div>
@@ -1491,6 +1580,509 @@ function Footer() {
   );
 }
 
+// ---------------- PWA app shell (mobile-first, Mansa palette) ----------------
+function ListingStats({ id }) {
+  const { t, i18n } = useTranslation();
+  const s = statSeed(id);
+  const updatedTs = Date.now() - Math.max(1, s.daysOn - 1) * DAY;
+  const items = [
+    [Eye, `${s.views}`, t("shell.stats.views")],
+    [Heart, `${s.saves}`, t("shell.stats.saves")],
+    [Clock, `${s.daysOn}`, t("shell.stats.daysOn")],
+    [History, relTime(updatedTs, i18n.language), t("shell.stats.updated")],
+  ];
+  return (
+    <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+      {items.map(([Ic, val, label], i) => (
+        <div key={i} className="flex items-center gap-2.5 rounded-2xl bg-gray-50 px-3.5 py-3 ring-1 ring-gray-100">
+          <Ic size={17} className="shrink-0 text-teal-600" />
+          <span className="min-w-0"><span className="block truncate text-sm font-extrabold text-gray-900">{val}</span><span className="block truncate text-[11px] font-medium text-gray-500">{label}</span></span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function NotifIcon({ kind }) {
+  const map = {
+    message: ["bg-teal-600", <MessageSquare key="i" size={17} />],
+    price: ["bg-teal-500", <TrendingUp key="i" size={17} />],
+    heart: ["bg-rose-500", <Heart key="i" size={17} />],
+    eye: ["bg-amber-500", <Eye key="i" size={17} />],
+    account: ["bg-gray-500", <Settings key="i" size={17} />],
+  };
+  const [bg, ic] = map[kind] || map.message;
+  return <span className={`grid h-11 w-11 shrink-0 place-items-center rounded-full ${bg} text-white`}>{ic}</span>;
+}
+
+// ---- Bandeau d'annonce piloté par l'admin (GET /api/settings) ----
+function AnnouncementBar() {
+  const { siteSettings } = useApp();
+  const { i18n } = useTranslation();
+  const [closed, setClosed] = useState(false);
+  const a = siteSettings?.announcement;
+  const text = a && (i18n.language === "fr" ? a.textFr : a.textEn);
+  if (!a?.enabled || !text || closed) return null;
+  return (
+    <div className="bg-teal-900 text-white">
+      <div className="mx-auto flex max-w-7xl items-center gap-2 px-4 py-2 text-xs font-semibold">
+        <Sparkles size={14} className="shrink-0 text-amber-400" />
+        <span className="min-w-0 flex-1 truncate">{text}</span>
+        <button onClick={() => setClosed(true)} className="grid h-6 w-6 shrink-0 place-items-center rounded-full text-white/70 hover:bg-white/10 hover:text-white" aria-label="Fermer"><X size={13} /></button>
+      </div>
+    </div>
+  );
+}
+
+function TopBar() {
+  const { user, navigate, openAuth, i18n } = useApp();
+  const { t } = useTranslation();
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <header className="sticky top-0 z-40 overflow-hidden border-b border-gray-100 bg-white/95 backdrop-blur-md lg:hidden">
+        <div className="flex items-center gap-2 px-3 py-2.5">
+          {user ? (
+            <button onClick={() => navigate("profile")} aria-label={t("shell.tabs.profile")} className="shrink-0"><Avatar name={user.name} src={user.avatar} size={34} /></button>
+          ) : (
+            <button onClick={openAuth} className="flex shrink-0 items-center gap-1.5 rounded-full bg-teal-50 px-3 py-1.5 text-xs font-bold text-teal-700"><CircleUserRound size={18} /> {t("shell.signIn")}</button>
+          )}
+          <span className="flex min-w-0 flex-1 justify-center"><Logo compact /></span>
+          <button onClick={() => setOpen(true)} className="grid h-10 w-10 shrink-0 place-items-center rounded-xl text-gray-700 ring-1 ring-gray-200" aria-label={t("nav.menu")}><Menu size={20} /></button>
+        </div>
+      </header>
+      {open && (
+        <div className="fixed inset-0 z-50 lg:hidden">
+          <div onClick={() => setOpen(false)} className="absolute inset-0 bg-gray-900/40" />
+          <div className="absolute right-3 top-3 w-64 rounded-3xl bg-white p-2 shadow-2xl ring-1 ring-gray-100">
+            <div className="flex items-center justify-between px-3 py-2">
+              <span className="mr-display text-sm font-extrabold text-gray-900">MansaRent</span>
+              <button onClick={() => setOpen(false)} className="grid h-9 w-9 place-items-center rounded-xl text-gray-500 hover:bg-gray-50" aria-label={t("nav.close")}><X size={18} /></button>
+            </div>
+            {[
+              ["post", <Plus key="i" size={17} />, t("nav.postListing")],
+              ["subscribe", <Crown key="i" size={17} />, t("subscribe.title")],
+              ["discover", <Users key="i" size={17} />, t("shell.discover.findAgent")],
+            ].map(([name, ic, label]) => (
+              <button key={name} onClick={() => { navigate(name); setOpen(false); }} className="flex w-full items-center gap-3 rounded-2xl px-3 py-3 text-left text-sm font-semibold text-gray-700 hover:bg-teal-50 hover:text-teal-700"><span className="text-teal-600">{ic}</span>{label}</button>
+            ))}
+            <div className="mx-3 my-2 border-t border-gray-100" />
+            <div className="flex items-center gap-2 px-3 py-2">
+              {(["fr", "en"]).map((l) => (
+                <button key={l} onClick={() => i18n.changeLanguage(l)} className={`flex-1 rounded-xl py-2 text-xs font-bold ${i18n.language === l ? "bg-teal-700 text-white" : "bg-gray-50 text-gray-600"}`}>{l.toUpperCase()}</button>
+              ))}
+            </div>
+            <button onClick={() => { navigate("home", { anchor: "contact" }); setOpen(false); }} className="flex w-full items-center gap-3 rounded-2xl px-3 py-3 text-left text-sm font-semibold text-gray-700 hover:bg-teal-50 hover:text-teal-700"><span className="text-teal-600"><LifeBuoy size={17} /></span>{t("shell.menu.help")}</button>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
+function BottomNav() {
+  const { route, navigate, favorites, conversations, notifications } = useApp();
+  const { t } = useTranslation();
+  const unreadMsg = conversations.filter((c) => c.unread).length + notifications.filter((n) => !n.read).length;
+  const tabs = [
+    ["search", "listings", <Search key="i" size={21} />, t("shell.tabs.search"), ["listings", "detail"]],
+    ["favorites", "favorites", <Heart key="i" size={21} />, t("shell.tabs.favorites"), ["favorites"]],
+    ["discover", "discover", <Compass key="i" size={21} />, t("shell.tabs.discover"), ["discover", "agent"]],
+    ["messages", "messages", <MessageSquare key="i" size={21} />, t("shell.tabs.messages"), ["messages"]],
+    ["profile", "profile", <CircleUserRound key="i" size={21} />, t("shell.tabs.profile"), ["profile", "post", "subscribe"]],
+  ];
+  return (
+    <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-gray-100 bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-md lg:hidden">
+      <div className="grid grid-cols-5 px-1 pt-1.5">
+        {tabs.map(([key, target, ic, label, match]) => {
+          const active = match.includes(route.name);
+          const badge = key === "favorites" ? favorites.length : key === "messages" ? unreadMsg : 0;
+          return (
+            <button key={key} onClick={() => navigate(target)} className={`relative flex flex-col items-center gap-0.5 rounded-2xl py-1.5 text-[10px] font-bold ${active ? "text-teal-700" : "text-gray-400"}`}>
+              <span className="relative">{ic}{badge > 0 && <span className="absolute -right-2 -top-1 grid h-4 min-w-4 place-items-center rounded-full bg-amber-500 px-1 text-[9px] font-extrabold text-teal-900">{badge > 9 ? "9+" : badge}</span>}</span>
+              {label}
+              {active && <span className="h-1 w-8 rounded-full bg-amber-500" />}
+            </button>
+          );
+        })}
+      </div>
+    </nav>
+  );
+}
+
+function BecomeAgent() {
+  const { registerAgent, navigate } = useApp();
+  const { t } = useTranslation();
+  const [open, setOpen] = useState(false);
+  const [f, setF] = useState({ name: "", phone: "", city: "Conakry", role: "agent", bio: "" });
+  const [err, setErr] = useState("");
+  const set = (k, v) => setF((p) => ({ ...p, [k]: v }));
+  const inp = "w-full rounded-xl border-0 bg-gray-50 px-4 py-3 text-sm text-gray-800 ring-1 ring-gray-200 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500";
+  const lab = "mb-1.5 block text-sm font-semibold text-gray-700";
+  const submit = () => {
+    if (!f.name.trim() || !f.phone.trim()) { setErr(t("shell.discover.formError")); return; }
+    const idx = registerAgent({ ...f, role: f.role === "agent" ? t("shell.discover.roleAgent") : t("shell.discover.roleOwner") });
+    navigate("agent", { id: idx });
+  };
+  return (
+    <div className="mt-4 overflow-hidden rounded-3xl bg-white ring-1 ring-gray-100">
+      <button onClick={() => setOpen(!open)} className="flex w-full items-center gap-3 p-4 text-left">
+        <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-amber-50 text-amber-600"><User size={20} /></span>
+        <span className="min-w-0 flex-1"><span className="mr-display block font-bold text-gray-900">{t("shell.discover.becomeTitle")}</span><span className="block truncate text-xs text-gray-500">{t("shell.discover.becomeSub")}</span></span>
+        <ChevronRight size={18} className={`shrink-0 text-gray-400 transition-transform ${open ? "rotate-90" : ""}`} />
+      </button>
+      {open && (
+        <div className="space-y-3 border-t border-gray-100 p-4">
+          <div><label className={lab}>{t("shell.discover.formName")}</label><input value={f.name} onChange={(e) => set("name", e.target.value)} placeholder={t("shell.discover.formNamePh")} className={inp} /></div>
+          <div><label className={lab}>{t("shell.discover.formPhone")}</label><input value={f.phone} onChange={(e) => set("phone", e.target.value)} placeholder={t("shell.discover.formPhonePh")} inputMode="tel" className={inp} /></div>
+          <div className="grid grid-cols-2 gap-3">
+            <div><label className={lab}>{t("shell.discover.formCity")}</label><select value={f.city} onChange={(e) => set("city", e.target.value)} className={`mr-sel ${inp} pr-9`}>{VILLES_KEYS.map((c) => <option key={c} value={c}>{t(`cities.${c}`)}</option>)}</select></div>
+            <div><label className={lab}>{t("shell.discover.formRole")}</label><select value={f.role} onChange={(e) => set("role", e.target.value)} className={`mr-sel ${inp} pr-9`}><option value="agent">{t("shell.discover.roleAgent")}</option><option value="owner">{t("shell.discover.roleOwner")}</option></select></div>
+          </div>
+          <div><label className={lab}>{t("shell.discover.formBio")}</label><textarea value={f.bio} onChange={(e) => set("bio", e.target.value)} placeholder={t("shell.discover.formBioPh")} rows={2} className={inp} /></div>
+          {err && <p className="text-xs font-semibold text-rose-600">{err}</p>}
+          <Btn variant="solid" className="w-full py-3" onClick={submit}>{t("shell.discover.submit")}</Btn>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function DiscoverPage() {
+  const { navigate, properties, agents } = useApp();
+  const { t } = useTranslation();
+  const isAgent = (a) => ((a.roleKey ? t(a.roleKey) : a.role) || "").toLowerCase().includes("gent");
+  const agentList = agents.map((a, i) => ({ ...a, i })).filter(isAgent);
+  const ownerList = agents.map((a, i) => ({ ...a, i })).filter((a) => !isAgent(a));
+  const featured = properties.filter((p) => p.featured).slice(0, 3);
+  return (
+    <div className="min-h-screen bg-gray-50/70">
+      <div className="mx-auto max-w-3xl px-5 py-8 lg:py-12">
+        <h1 className="mr-display text-2xl font-extrabold text-gray-900 sm:text-3xl">{t("shell.discover.title")}</h1>
+        <p className="mt-1 text-sm text-gray-500">{t("shell.discover.subtitle")}</p>
+        <div className="mt-6 grid gap-4 sm:grid-cols-2">
+          <button onClick={() => navigate("agent", { id: (agentList[0] || { i: 1 }).i ?? 1 })} className="overflow-hidden rounded-3xl bg-gradient-to-br from-teal-700 to-teal-900 p-5 text-left text-white shadow-lg">
+            <span className="grid h-12 w-12 place-items-center rounded-2xl bg-white/15"><Users size={24} /></span>
+            <div className="mr-display mt-4 text-lg font-extrabold">{t("shell.discover.findAgent")}</div>
+            <div className="mt-1 text-sm text-white/80">{t("shell.discover.findAgentSub")}</div>
+            <div className="mt-3 inline-flex items-center gap-1 text-sm font-bold text-amber-300">{t("shell.discover.viewAll")} <ArrowRight size={15} /></div>
+          </button>
+          <button onClick={() => navigate("agent", { id: (ownerList[0] || { i: 0 }).i ?? 0 })} className="overflow-hidden rounded-3xl bg-gradient-to-br from-amber-500 to-amber-700 p-5 text-left text-white shadow-lg">
+            <span className="grid h-12 w-12 place-items-center rounded-2xl bg-white/20"><Building2 size={24} /></span>
+            <div className="mr-display mt-4 text-lg font-extrabold">{t("shell.discover.findLandlord")}</div>
+            <div className="mt-1 text-sm text-white/85">{t("shell.discover.findLandlordSub")}</div>
+            <div className="mt-3 inline-flex items-center gap-1 text-sm font-bold text-white">{t("shell.discover.viewAll")} <ArrowRight size={15} /></div>
+          </button>
+        </div>
+        <h2 className="mr-display mt-8 text-lg font-extrabold text-gray-900">{t("shell.discover.people")}</h2>
+        <BecomeAgent />
+        <div className="mt-3 overflow-hidden rounded-3xl bg-white ring-1 ring-gray-100">
+          {agents.map((a, i) => (
+            <button key={i} onClick={() => navigate("agent", { id: i })} className="flex w-full items-center gap-3 border-b border-gray-50 px-4 py-3.5 text-left last:border-0 hover:bg-teal-50/50">
+              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-teal-700 text-sm font-bold text-white">{a.name.charAt(0)}</span>
+              <span className="min-w-0 flex-1"><span className="mr-display block truncate font-bold text-gray-900">{a.name}</span><span className="block truncate text-xs text-gray-500">{dispRole(a, t)} · {dispCity(a, t)}</span></span>
+              <ChevronRight size={17} className="shrink-0 text-gray-300" />
+            </button>
+          ))}
+        </div>
+        <h2 className="mr-display mt-8 text-lg font-extrabold text-gray-900">{t("shell.discover.moreWays")}</h2>
+        <div className="mt-3 grid gap-3">
+          {[
+            ["featured", <Sparkles key="i" size={19} />, "bg-teal-50 text-teal-700", t("shell.discover.featured"), t("shell.discover.featuredSub"), () => navigate("listings")],
+            ["new", <Clock key="i" size={19} />, "bg-amber-50 text-amber-600", t("shell.discover.newListings"), t("shell.discover.newListingsSub"), () => navigate("listings")],
+            ["tips", <LifeBuoy key="i" size={19} />, "bg-gray-100 text-gray-600", t("shell.discover.tips"), t("shell.discover.tipsSub"), () => navigate("home", { anchor: "apropos" })],
+          ].map(([k, ic, cls, title, sub, fn]) => (
+            <button key={k} onClick={fn} className="flex items-center gap-3 rounded-3xl bg-white p-4 text-left ring-1 ring-gray-100 hover:ring-teal-200">
+              <span className={`grid h-11 w-11 shrink-0 place-items-center rounded-2xl ${cls}`}>{ic}</span>
+              <span className="min-w-0 flex-1"><span className="mr-display block font-bold text-gray-900">{title}</span><span className="block truncate text-xs text-gray-500">{sub}</span></span>
+              <ChevronRight size={17} className="shrink-0 text-gray-300" />
+            </button>
+          ))}
+        </div>
+        {featured.length > 0 && (
+          <><h2 className="mr-display mt-8 text-lg font-extrabold text-gray-900">{t("shell.discover.featured")}</h2>
+          <div className="mt-3 grid gap-4 sm:grid-cols-2">{featured.map((p) => <PropertyCard key={p.id} p={p} />)}</div></>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function ProfilePage() {
+  const { user, navigate, logout, openAuth, favorites, conversations, notifications, i18n, showToast } = useApp();
+  const { t } = useTranslation();
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-gray-50/70"><div className="mx-auto max-w-md px-5 py-20 text-center">
+        <span className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-teal-50 text-teal-700"><CircleUserRound size={30} /></span>
+        <h1 className="mr-display mt-5 text-2xl font-extrabold text-gray-900">{t("shell.profile.loginTitle")}</h1>
+        <p className="mt-2 text-sm text-gray-500">{t("shell.profile.loginSubtitle")}</p>
+        <Btn variant="solid" className="mt-6 w-full py-3.5" onClick={openAuth}>{t("shell.signIn")}</Btn>
+      </div></div>
+    );
+  }
+  const unread = conversations.filter((c) => c.unread).length + notifications.filter((n) => !n.read).length;
+  const sub = isSubscribed(user);
+  const trialDays = daysLeft(user.trialEndsAt);
+  const rows = [
+    ["saved", <Heart key="i" size={19} />, t("shell.profile.saved"), `${favorites.length}`, () => navigate("favorites")],
+    ["notifs", <Bell key="i" size={19} />, t("shell.profile.notifications"), unread > 0 ? `${unread}` : "", () => navigate("messages")],
+    ["post", <Plus key="i" size={19} />, t("nav.postListing"), "", () => navigate("post")],
+    ...(user.role === "admin" ? [["admin", <Settings key="i" size={19} />, t("shell.admin.title"), "", () => navigate("admin")]] : []),
+  ];
+  return (
+    <div className="min-h-screen bg-gray-50/70"><div className="mx-auto max-w-3xl px-5 py-8 lg:py-12">
+      <div className="flex items-center gap-4 rounded-3xl bg-white p-5 ring-1 ring-gray-100">
+        <Avatar name={user.name} src={user.avatar} size={60} />
+        <div className="min-w-0 flex-1">
+          <h1 className="mr-display truncate text-xl font-extrabold text-gray-900">{user.name}</h1>
+          <p className="truncate text-sm text-gray-500">{user.email}</p>
+          <span className={`mt-2 inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-bold ${isSubscribed(user) ? "bg-teal-50 text-teal-700" : "bg-amber-50 text-amber-700"}`}><Crown size={12} /> {isSubscribed(user) ? t("trialBanner.active") : t("trialBanner.remaining", { count: daysLeft(user.trialEndsAt), countPlural: daysLeft(user.trialEndsAt) > 1 ? "s" : "", price: formatGNF(SUBSCRIPTION_PRICE) })}</span>
+        </div>
+      </div>
+      <div className="mt-4 overflow-hidden rounded-3xl bg-gradient-to-br from-teal-700 via-teal-800 to-teal-900 p-5 text-white shadow-lg">
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex min-w-0 items-center gap-2.5">
+            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-amber-500 text-teal-900"><Crown size={22} /></span>
+            <div className="min-w-0">
+              <div className="mr-display truncate text-base font-extrabold">{t("subscribe.title")}</div>
+              <div className="truncate text-xs text-white/70">{formatGNF(SUBSCRIPTION_PRICE)}{t("propertyCard.perMonth")}</div>
+            </div>
+          </div>
+          <span className={`shrink-0 rounded-full px-3 py-1 text-[11px] font-extrabold ${sub ? "bg-amber-500 text-teal-900" : "bg-white/15 text-white"}`}>{sub ? t("trialBanner.active") : t("trialBanner.manage")}</span>
+        </div>
+        <p className="mt-3 text-xs leading-relaxed text-white/75">
+          {sub
+            ? t("trialBanner.active")
+            : trialDays > 0
+              ? t("trialBanner.remaining", { count: trialDays, countPlural: trialDays > 1 ? "s" : "", price: formatGNF(SUBSCRIPTION_PRICE) })
+              : t("subscribe.title")}
+        </p>
+        <ul className="mt-4 space-y-2 border-t border-white/15 pt-4">
+          {["subscribe.planFeatures.unlimited", "subscribe.planFeatures.verifiedBadge", "subscribe.planFeatures.premiumVisibility", "subscribe.planFeatures.unlimitedMessaging", "subscribe.planFeatures.analytics"].map((key) => (
+            <li key={key} className="flex items-start gap-2 text-xs font-medium text-white/90"><span className="mt-0.5 grid h-4.5 w-4.5 shrink-0 place-items-center rounded-full bg-amber-500 text-teal-900" style={{ height: 18, width: 18 }}><Check size={11} strokeWidth={3.5} /></span>{t(key)}</li>
+          ))}
+        </ul>
+        <button onClick={() => navigate("subscribe")} className="mt-4 w-full rounded-full bg-amber-500 py-3 text-sm font-extrabold text-teal-900 transition hover:bg-amber-400">{t("trialBanner.manage")}</button>
+      </div>
+      <div className="mt-4 overflow-hidden rounded-3xl bg-white ring-1 ring-gray-100">
+        {rows.map(([k, ic, label, badge, fn]) => (
+          <button key={k} onClick={fn} className="flex w-full items-center gap-3 border-b border-gray-50 px-4 py-4 text-left last:border-0 hover:bg-teal-50/50">
+            <span className="grid h-10 w-10 place-items-center rounded-2xl bg-teal-50 text-teal-700">{ic}</span>
+            <span className="flex-1 text-sm font-bold text-gray-800">{label}</span>
+            {badge !== "" && <span className="grid h-6 min-w-6 place-items-center rounded-full bg-amber-500 px-1.5 text-xs font-extrabold text-teal-900">{badge}</span>}
+            <ChevronRight size={17} className="text-gray-300" />
+          </button>
+        ))}
+        <div className="flex items-center gap-3 border-b border-gray-50 px-4 py-3">
+          <span className="grid h-10 w-10 place-items-center rounded-2xl bg-teal-50 text-teal-700"><Settings size={19} /></span>
+          <span className="flex-1 text-sm font-bold text-gray-800">{t("shell.profile.language")}</span>
+          <span className="flex gap-1">{["fr", "en"].map((l) => (<button key={l} onClick={() => i18n.changeLanguage(l)} className={`rounded-lg px-3 py-1.5 text-xs font-bold ${i18n.language === l ? "bg-teal-700 text-white" : "bg-gray-100 text-gray-600"}`}>{l.toUpperCase()}</button>))}</span>
+        </div>
+        <button onClick={() => navigate("home", { anchor: "contact" })} className="flex w-full items-center gap-3 border-b border-gray-50 px-4 py-4 text-left last:border-0 hover:bg-teal-50/50">
+          <span className="grid h-10 w-10 place-items-center rounded-2xl bg-teal-50 text-teal-700"><LifeBuoy size={19} /></span>
+          <span className="flex-1 text-sm font-bold text-gray-800">{t("shell.profile.help")}</span>
+          <ChevronRight size={17} className="text-gray-300" />
+        </button>
+        <button onClick={() => { logout(); navigate("home"); }} className="flex w-full items-center gap-3 px-4 py-4 text-left hover:bg-rose-50">
+          <span className="grid h-10 w-10 place-items-center rounded-2xl bg-rose-50 text-rose-500"><LogOut size={19} /></span>
+          <span className="flex-1 text-sm font-bold text-rose-600">{t("shell.profile.signOut")}</span>
+        </button>
+      </div>
+    </div></div>
+  );
+}
+
+function NotificationsList() {
+  const { notifications, markNotifRead, agents } = useApp();
+  const { t, i18n } = useTranslation();
+  useEffect(() => { markNotifRead(); }, []);
+  if (notifications.length === 0) {
+    return <div className="mt-8 flex flex-col items-center rounded-3xl bg-white py-16 text-center ring-1 ring-gray-100"><span className="grid h-16 w-16 place-items-center rounded-full bg-teal-50 text-teal-700"><Bell size={28} /></span><h3 className="mr-display mt-5 text-xl font-bold text-gray-900">{t("shell.notifs.empty")}</h3><p className="mt-2 max-w-sm text-sm text-gray-500">{t("shell.notifs.emptyHint")}</p></div>;
+  }
+  return (
+    <div className="mt-6 overflow-hidden rounded-3xl bg-white ring-1 ring-gray-100">
+      {notifications.map((n) => (
+        <div key={n.id} className={`flex items-center gap-3 border-b border-gray-50 px-4 py-3.5 last:border-0 ${n.read ? "" : "bg-teal-50/40"}`}>
+          <NotifIcon kind={n.icon} />
+          <div className="min-w-0 flex-1">
+            <div className="mr-display truncate text-sm font-bold text-gray-900">{t(n.titleKey)}</div>
+            <div className="truncate text-xs text-gray-500">{t(n.textKey, { name: n.agentIdx != null && agents[n.agentIdx] ? agents[n.agentIdx].name : (n.name || ""), ...(n.params || {}) })}</div>
+          </div>
+          <span className="shrink-0 text-[11px] font-medium text-gray-400">{relTime(n.ts, i18n.language)}</span>
+          {!n.read && <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-amber-500" />}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function InstallBanner() {
+  const { t } = useTranslation();
+  const [evt, setEvt] = useState(null);
+  const [dismissed, setDismissed] = useState(() => { try { return localStorage.getItem("mr-pwa-dismissed") === "1"; } catch { return false; } });
+  const [standalone, setStandalone] = useState(false);
+  useEffect(() => {
+    try {
+      const mq = window.matchMedia("(display-mode: standalone)");
+      setStandalone(mq.matches || window.navigator.standalone === true);
+    } catch { /* noop */ }
+    const onBIP = (e) => { e.preventDefault(); setEvt(e); };
+    const onInstalled = () => setEvt(null);
+    window.addEventListener("beforeinstallprompt", onBIP);
+    window.addEventListener("appinstalled", onInstalled);
+    return () => { window.removeEventListener("beforeinstallprompt", onBIP); window.removeEventListener("appinstalled", onInstalled); };
+  }, []);
+  if (standalone || dismissed || !evt) return null;
+  const dismiss = () => { try { localStorage.setItem("mr-pwa-dismissed", "1"); } catch { /* noop */ } setDismissed(true); };
+  const install = async () => { try { evt.prompt(); const c = await evt.userChoice; if (c && c.outcome === "accepted") setEvt(null); else dismiss(); } catch { dismiss(); } };
+  return (
+    <div className="fixed inset-x-4 bottom-24 z-40 lg:bottom-6 lg:left-auto lg:right-6 lg:w-96">
+      <div className="flex items-center gap-3 rounded-3xl bg-teal-900 p-4 text-white shadow-2xl ring-1 ring-teal-700">
+        <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-amber-500 font-extrabold text-teal-900">M</span>
+        <div className="min-w-0 flex-1">
+          <div className="mr-display truncate text-sm font-extrabold">{t("shell.install.title")}</div>
+          <div className="truncate text-xs text-white/70">{t("shell.install.sub")}</div>
+        </div>
+        <button onClick={install} className="flex shrink-0 items-center gap-1.5 rounded-full bg-amber-500 px-4 py-2.5 text-xs font-extrabold text-teal-900 transition hover:bg-amber-400"><Download size={15} /> {t("shell.install.btn")}</button>
+        <button onClick={dismiss} className="grid h-8 w-8 shrink-0 place-items-center rounded-full text-white/70 transition hover:bg-white/10 hover:text-white" aria-label={t("shell.install.dismiss")}><X size={16} /></button>
+      </div>
+    </div>
+  );
+}
+
+// ---------------- Admin (nécessite backend + rôle admin) ----------------
+function AdminPage() {
+  const { user, navigate, showToast } = useApp();
+  const { t } = useTranslation();
+  const hasBackend = !!import.meta.env.VITE_API_URL;
+  const [tab, setTab] = useState("integrations");
+  const [integrations, setIntegrations] = useState(null);
+  const [drafts, setDrafts] = useState({});
+  const [settings, setSettings] = useState(null);
+  const [heroFile, setHeroFile] = useState(null);
+  const [busy, setBusy] = useState(false);
+
+  useEffect(() => {
+    if (!hasBackend || user?.role !== "admin") return;
+    AdminAPI.integrations().then((r) => {
+      setIntegrations(r.integrations || []);
+      const d = {};
+      for (const it of r.integrations || []) {
+        d[it.provider] = { enabled: it.enabled, values: Object.fromEntries(it.fields.filter((f) => !f.secret).map((f) => [f.key, f.value || ""])) };
+      }
+      setDrafts(d);
+    }).catch(() => {});
+    AdminAPI.settings().then((r) => setSettings(r.settings || {})).catch(() => {});
+  }, [hasBackend, user?.role]);
+
+  if (!hasBackend) return <div className="mx-auto max-w-2xl px-5 py-24 text-center"><p className="text-gray-500">{t("shell.admin.needBackend")}</p><Btn variant="ghost" className="mt-4 px-5 py-2.5" onClick={() => navigate("home")}>{t("detail.back")}</Btn></div>;
+  if (user?.role !== "admin") return <div className="mx-auto max-w-2xl px-5 py-24 text-center"><p className="text-gray-500">{t("shell.admin.needRole")}</p><Btn variant="ghost" className="mt-4 px-5 py-2.5" onClick={() => navigate("home")}>{t("detail.back")}</Btn></div>;
+
+  const setD = (provider, patch) => setDrafts((d) => ({ ...d, [provider]: { ...d[provider], ...patch } }));
+  const setVal = (provider, key, v) => setDrafts((d) => ({ ...d, [provider]: { ...d[provider], values: { ...d[provider].values, [key]: v } } }));
+  const saveInteg = async (provider) => {
+    setBusy(true);
+    try { await AdminAPI.saveIntegration(provider, { enabled: drafts[provider].enabled, config: drafts[provider].values }); showToast(t("shell.admin.saved")); }
+    catch { showToast(t("shell.admin.error")); }
+    setBusy(false);
+  };
+  const saveSet = async (key, value) => {
+    setBusy(true);
+    try { const r = await AdminAPI.saveSetting(key, value); setSettings((s) => ({ ...s, [key]: r.value })); showToast(t("shell.admin.saved")); }
+    catch { showToast(t("shell.admin.error")); }
+    setBusy(false);
+  };
+  const uploadHero = async () => {
+    if (!heroFile) return;
+    setBusy(true);
+    try {
+      const r = await AdminAPI.uploadImage(heroFile);
+      await saveSet("hero", { ...(settings.hero || {}), image: r.url });
+      setHeroFile(null);
+    } catch { showToast(t("shell.admin.error")); }
+    setBusy(false);
+  };
+  const inp = "w-full rounded-xl border-0 bg-gray-50 px-4 py-2.5 text-sm text-gray-800 ring-1 ring-gray-200 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500";
+  const lab = "mb-1 block text-xs font-semibold text-gray-500";
+
+  return (
+    <div className="min-h-screen bg-gray-50/70"><div className="mx-auto max-w-5xl px-5 py-8 lg:py-12">
+      <button onClick={() => navigate("profile")} className="mb-5 inline-flex items-center gap-2 text-sm font-semibold text-gray-600 hover:text-teal-700"><ArrowLeft size={16} /> {t("detail.back")}</button>
+      <h1 className="mr-display text-2xl font-extrabold text-gray-900 sm:text-3xl">{t("shell.admin.title")}</h1>
+      <p className="mt-1 text-sm text-gray-500">{t("shell.admin.subtitle")}</p>
+      <div className="mt-5 flex gap-2">
+        {(["integrations", "content"]).map((k) => (
+          <button key={k} onClick={() => setTab(k)} className={`rounded-full px-5 py-2.5 text-sm font-bold ${tab === k ? "bg-teal-700 text-white" : "bg-white text-gray-600 ring-1 ring-gray-200"}`}>{t(`shell.admin.tabs.${k}`)}</button>
+        ))}
+      </div>
+      {tab === "integrations" && (
+        <div className="mt-6 space-y-4">
+          <p className="text-sm text-gray-500">{t("shell.admin.integSubtitle")}</p>
+          {!integrations && <p className="text-sm text-gray-400">…</p>}
+          {(integrations || []).map((it) => (
+            <div key={it.provider} className="rounded-3xl bg-white p-5 ring-1 ring-gray-100">
+              <div className="flex items-center justify-between gap-3">
+                <div className="mr-display font-extrabold text-gray-900">{it.label}</div>
+                <button onClick={() => setD(it.provider, { enabled: !drafts[it.provider]?.enabled })} className={`relative h-7 w-12 shrink-0 rounded-full transition ${drafts[it.provider]?.enabled ? "bg-teal-600" : "bg-gray-200"}`} aria-label={t("shell.admin.enabled")}>
+                  <span className={`absolute top-1 h-5 w-5 rounded-full bg-white shadow transition-all ${drafts[it.provider]?.enabled ? "left-6" : "left-1"}`} />
+                </button>
+              </div>
+              <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                {it.fields.map((f) => (
+                  <div key={f.key}>
+                    <label className={lab}>{f.label} {f.secret && <span className={`ml-1 rounded-full px-1.5 py-0.5 text-[10px] font-bold ${f.set ? "bg-teal-50 text-teal-700" : "bg-gray-100 text-gray-400"}`}>{f.set ? t("shell.admin.secretSet") : t("shell.admin.secretEmpty")}</span>}</label>
+                    <input type={f.secret ? "password" : "text"} autoComplete="off" placeholder={f.secret ? "••••••••" : f.key} value={drafts[it.provider]?.values[f.key] || ""} onChange={(e) => setVal(it.provider, f.key, e.target.value)} className={inp} />
+                  </div>
+                ))}
+              </div>
+              <Btn variant="solid" className="mt-4 px-6 py-2.5 text-sm" disabled={busy} onClick={() => saveInteg(it.provider)}>{t("shell.admin.save")}</Btn>
+            </div>
+          ))}
+        </div>
+      )}
+      {tab === "content" && settings && (
+        <div className="mt-6 space-y-4">
+          <div className="rounded-3xl bg-white p-5 ring-1 ring-gray-100">
+            <div className="mr-display font-extrabold text-gray-900">{t("shell.admin.announcement")}</div>
+            <label className="mt-3 flex items-center gap-2 text-sm font-semibold text-gray-700"><input type="checkbox" checked={!!settings.announcement?.enabled} onChange={(e) => setSettings((s) => ({ ...s, announcement: { ...s.announcement, enabled: e.target.checked } }))} className="h-4 w-4 accent-teal-700" /> {t("shell.admin.enabled")}</label>
+            <div className="mt-3 grid gap-3 sm:grid-cols-2">
+              <div><label className={lab}>{t("shell.admin.annFr")}</label><input value={settings.announcement?.textFr || ""} onChange={(e) => setSettings((s) => ({ ...s, announcement: { ...s.announcement, textFr: e.target.value } }))} className={inp} /></div>
+              <div><label className={lab}>{t("shell.admin.annEn")}</label><input value={settings.announcement?.textEn || ""} onChange={(e) => setSettings((s) => ({ ...s, announcement: { ...s.announcement, textEn: e.target.value } }))} className={inp} /></div>
+            </div>
+            <Btn variant="solid" className="mt-4 px-6 py-2.5 text-sm" disabled={busy} onClick={() => saveSet("announcement", settings.announcement)}>{t("shell.admin.save")}</Btn>
+          </div>
+          <div className="rounded-3xl bg-white p-5 ring-1 ring-gray-100">
+            <div className="mr-display font-extrabold text-gray-900">{t("shell.admin.heroImage")}</div>
+            {settings.hero?.image && <img src={settings.hero.image} alt="hero" className="mt-3 h-40 w-full rounded-2xl object-cover" />}
+            <div className="mt-3 flex flex-col gap-3 sm:flex-row">
+              <input type="file" accept="image/*" onChange={(e) => setHeroFile(e.target.files?.[0] || null)} className="flex-1 text-sm text-gray-600" />
+              <Btn variant="solid" className="px-6 py-2.5 text-sm" disabled={busy || !heroFile} onClick={uploadHero}>{busy ? t("shell.admin.uploading") : t("shell.admin.upload")}</Btn>
+            </div>
+          </div>
+          <div className="rounded-3xl bg-white p-5 ring-1 ring-gray-100">
+            <div className="mr-display font-extrabold text-gray-900">{t("shell.admin.categories")}</div>
+            <div className="mt-3 grid gap-3 sm:grid-cols-2">
+              {TYPES_KEYS.map((ty) => (
+                <div key={ty}><label className={lab}>{t(`types.${ty}`)}</label><input value={settings.categories?.[ty] || ""} placeholder="https://…" onChange={(e) => setSettings((s) => ({ ...s, categories: { ...s.categories, [ty]: e.target.value } }))} className={inp} /></div>
+              ))}
+            </div>
+            <Btn variant="solid" className="mt-4 px-6 py-2.5 text-sm" disabled={busy} onClick={() => saveSet("categories", settings.categories)}>{t("shell.admin.save")}</Btn>
+          </div>
+          <div className="rounded-3xl bg-white p-5 ring-1 ring-gray-100">
+            <div className="mr-display font-extrabold text-gray-900">{t("shell.admin.contact")}</div>
+            <div className="mt-3 grid gap-3 sm:grid-cols-2">
+              <div><label className={lab}>{t("shell.admin.phone")}</label><input value={settings.contact?.phone || ""} onChange={(e) => setSettings((s) => ({ ...s, contact: { ...s.contact, phone: e.target.value } }))} className={inp} /></div>
+              <div><label className={lab}>{t("shell.admin.email")}</label><input value={settings.contact?.email || ""} onChange={(e) => setSettings((s) => ({ ...s, contact: { ...s.contact, email: e.target.value } }))} className={inp} /></div>
+            </div>
+            <Btn variant="solid" className="mt-4 px-6 py-2.5 text-sm" disabled={busy} onClick={() => saveSet("contact", settings.contact)}>{t("shell.admin.save")}</Btn>
+          </div>
+        </div>
+      )}
+    </div></div>
+  );
+}
+
 const TikTok = (props) => (<svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18" {...props}><path d="M16.6 5.82a4.28 4.28 0 0 1-1.06-2.82h-3.2v12.8a2.33 2.33 0 1 1-2.33-2.33c.24 0 .47.04.69.1V8.3a5.6 5.6 0 0 0-.69-.04 5.55 5.55 0 1 0 5.55 5.55V8.6a7.5 7.5 0 0 0 4.34 1.39V6.8a4.28 4.28 0 0 1-3.3-.98z" /></svg>);
 
 export default function MansaRent() {
@@ -1504,6 +2096,23 @@ export default function MansaRent() {
   const [authOpen, setAuthOpen] = useState(false);
   const [toast, setToast] = useState(null);
   const [conversations, setConversations] = useState([]);
+  const [siteSettings, setSiteSettings] = useState(null);
+  useEffect(() => {
+    // Ajustements admin (annonce, images…) — backend uniquement, jamais en démo.
+    if (!import.meta.env.VITE_API_URL) return;
+    SettingsAPI.get().then(setSiteSettings).catch(() => {});
+  }, []);
+  const [agents, setAgents] = useState(LANDLORDS);
+  const registerAgent = (data) => {
+    const idx = agents.length;
+    const a = { name: data.name.trim(), phone: data.phone.trim(), role: data.role, city: data.city, since: new Date().getFullYear(), bio: (data.bio || "").trim() };
+    setAgents((prev) => [...prev, a]);
+    showToast(t("shell.discover.success", { name: a.name }));
+    return idx;
+  };
+  const [notifications, setNotifications] = useState(SEED_NOTIFICATIONS);
+  const markNotifRead = () => setNotifications((ns) => (ns.some((n) => !n.read) ? ns.map((n) => ({ ...n, read: true })) : ns));
+  const pushNotif = (n) => setNotifications((ns) => [{ id: "n" + Date.now(), ts: Date.now(), read: false, ...n }, ...ns]);
   const [reviews, setReviews] = useState(SEED_REVIEWS);
   const toastTimer = useRef(null);
 
@@ -1551,8 +2160,10 @@ export default function MansaRent() {
     const txt = (text || "").trim();
     if (!txt) return;
     setConversations((cs) => cs.map((c) => c.id === convId ? { ...c, unread: false, messages: [...c.messages, { id: "m" + Date.now(), from: "me", text: txt, ts: Date.now() }] } : c));
+    const conv = conversations.find((c) => c.id === convId);
     setTimeout(() => {
       setConversations((cs) => cs.map((c) => c.id === convId ? { ...c, unread: true, messages: [...c.messages, { id: "r" + Date.now(), from: "agent", text: t("chat.autoReply"), ts: Date.now() }] } : c));
+      pushNotif({ icon: "message", titleKey: "shell.notifs.seedMsg", textKey: "shell.notifs.seedMsgText", name: conv?.agentName || "" });
     }, 1100);
   };
   const markConversationRead = (id) => setConversations((cs) => (cs.some((c) => c.id === id && c.unread) ? cs.map((c) => (c.id === id ? { ...c, unread: false } : c)) : cs));
@@ -1575,6 +2186,9 @@ export default function MansaRent() {
     authOpen, openAuth: () => setAuthOpen(true), closeAuth: () => setAuthOpen(false),
     toast, showToast,
     conversations, startConversation, sendMessage, markConversationRead,
+    notifications, markNotifRead,
+    agents, registerAgent,
+    siteSettings,
     reviews, addReview, subscribe,
     i18n,
   };
@@ -1585,6 +2199,9 @@ export default function MansaRent() {
   else if (route.name === "post") page = <PostPage />;
   else if (route.name === "favorites") page = <FavoritesPage />;
   else if (route.name === "messages") page = <MessagesPage />;
+  else if (route.name === "discover") page = <DiscoverPage />;
+  else if (route.name === "profile") page = <ProfilePage />;
+  else if (route.name === "admin") page = <AdminPage />;
   else if (route.name === "subscribe") page = <SubscribePage />;
   else if (route.name === "agent") page = <AgentProfilePage />;
   else page = <HomePage />;
@@ -1593,9 +2210,13 @@ export default function MansaRent() {
     <AppCtx.Provider value={ctx}>
       <div className="mr-root min-h-screen bg-white text-gray-900">
         <GlobalStyles />
-        <Navbar />
-        <main>{page}</main>
-        <Footer />
+        <div className="hidden lg:block"><Navbar /></div>
+        <TopBar />
+        <AnnouncementBar />
+        <main className="pb-24 lg:pb-0">{page}</main>
+        <div className="hidden lg:block"><Footer /></div>
+        <BottomNav />
+        <InstallBanner />
         <AuthModal />
         <Toast />
       </div>

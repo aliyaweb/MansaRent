@@ -6,6 +6,10 @@
 import { Router } from "express";
 import { prisma } from "../lib/db.js";
 import { requireAuth, requireAdmin } from "../middleware/auth.js";
+import upload from "../middleware/upload.js";
+import { Storage } from "../lib/storage.js";
+import { listIntegrations, saveIntegration } from "../lib/integrations.js";
+import { getAllSettings, saveSetting } from "../lib/settings.js";
 
 const router = Router();
 router.use(requireAuth, requireAdmin);
@@ -137,6 +141,61 @@ router.get("/payments", async (_req, res) => {
   } catch (e) {
     console.error(e);
     res.status(500).json({ error: "Paiements impossibles à charger" });
+  }
+});
+
+// ---- Intégrations API (paiement, e-mail, stockage, OAuth…) -------------
+// L'admin connecte les fournisseurs ici : clés chiffrées en base,
+// prioritaires sur le .env, appliquées sans redémarrage.
+router.get("/integrations", async (_req, res) => {
+  try {
+    res.json({ integrations: await listIntegrations() });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: "Intégrations impossibles à charger" });
+  }
+});
+
+router.put("/integrations/:provider", async (req, res) => {
+  try {
+    const saved = await saveIntegration(req.params.provider, req.body || {});
+    res.json(saved);
+  } catch (e) {
+    console.error(e);
+    res.status(400).json({ error: e.message || "Sauvegarde impossible" });
+  }
+});
+
+// ---- Réglages du site (contenu frontend) --------------------------------
+router.get("/settings", async (_req, res) => {
+  try {
+    res.json({ settings: await getAllSettings() });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: "Réglages impossibles à charger" });
+  }
+});
+
+router.put("/settings/:key", async (req, res) => {
+  try {
+    res.json(await saveSetting(req.params.key, req.body?.value));
+  } catch (e) {
+    console.error(e);
+    res.status(400).json({ error: e.message || "Sauvegarde impossible" });
+  }
+});
+
+// ---- Upload d'image (hero, catégories…) → URL publique ------------------
+router.post("/uploads", upload.single("image"), async (req, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ error: "Aucune image reçue (champ « image »)" });
+    const ext = (req.file.mimetype.split("/")[1] || "jpg").split("+")[0];
+    const r = await Storage.upload(req.file.buffer, { contentType: req.file.mimetype, ext, prefix: "site" });
+    if (r.demo) return res.status(503).json({ error: "Stockage R2 non configuré (connectez-le dans Intégrations)" });
+    res.json({ url: r.url, key: r.key });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: "Upload impossible" });
   }
 });
 

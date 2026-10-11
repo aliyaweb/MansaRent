@@ -8,3 +8,16 @@ dist-ssr
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# Android release signing (secrets — never commit)
+android/keystore.properties
+android/*.keystore
+android/*.jks
+# Android build outputs
+android/app/build/
+android/build/
+android/.gradle/
+# Signed APK output
+release/
+# Capacitor generated web copy (rebuilt by `npx cap sync`)
+android/app/src/main/assets/

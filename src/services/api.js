@@ -34,6 +34,21 @@ async function http(path, options = {}) {
   return res.status === 204 ? null : res.json();
 }
 
+// Multipart (uploads) : pas de Content-Type JSON, le navigateur met le boundary.
+async function httpForm(path, formData, options = {}) {
+  const res = await fetch(`${BASE_URL}${path}`, {
+    method: "POST",
+    headers: { ...authHeaders(), ...(options.headers || {}) },
+    body: formData,
+    ...options,
+  });
+  if (!res.ok) {
+    const message = await res.text().catch(() => res.statusText);
+    throw new Error(`API ${res.status} : ${message}`);
+  }
+  return res.json();
+}
+
 // ---- Propriétés -------------------------------------------------
 export const PropertyAPI = {
   // filters: { city, type, rental, beds, minPrice, maxPrice, q, sort }
@@ -91,8 +106,7 @@ export const FavoriteAPI = {
 
 // ---- Paiement / abonnement -------------------------------------
 // Branché sur le backend server/ (CinetPay, Hub2, Orange Money, MTN MoMo).
-export const PaymentAPI = {
-  // provider: 'cinetpay' | 'hub2' | 'orange' | 'mtnmomo'
+export const PaymentAPI = {  // provider: 'cinetpay' | 'hub2' | 'orange' | 'mtnmomo'
   // method:   'orange' | 'momo' | 'card'
   checkout({ userId, provider, method, phone, otp, customer }) {
     return http(`/subscriptions/checkout`, {
@@ -115,6 +129,43 @@ export const PaymentAPI = {
       await new Promise((r) => setTimeout(r, interval));
     }
     return false;
+  },
+};
+
+// ---- Réglages publics du site (pilotés par l'admin) ----------------
+// Renvoie { announcement, hero, categories, contact }. Fonctionne même
+// sans compte. En mode démo (pas de backend), l'appel échoue : ignorer.
+export const SettingsAPI = {
+  async get() {
+    const r = await http(`/settings`);
+    return r.settings || {};
+  },
+};
+
+// ---- Administration (rôle admin requis) ---------------------------
+export const AdminAPI = {
+  integrations() {
+    return http(`/admin/integrations`);
+  },
+  saveIntegration(provider, { enabled, config }) {
+    return http(`/admin/integrations/${provider}`, {
+      method: "PUT",
+      body: JSON.stringify({ enabled, config }),
+    });
+  },
+  settings() {
+    return http(`/admin/settings`);
+  },
+  saveSetting(key, value) {
+    return http(`/admin/settings/${key}`, {
+      method: "PUT",
+      body: JSON.stringify({ value }),
+    });
+  },
+  uploadImage(file) {
+    const fd = new FormData();
+    fd.append("image", file);
+    return httpForm(`/admin/uploads`, fd);
   },
 };
 

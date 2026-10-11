@@ -39,37 +39,68 @@
     }
   },
   "categories": {
-    "tag": "Parcourir par catégorie",
-    "title": "Explorez les types de biens",
-    "subtitle": "Quel que soit votre besoin, MansaRent a l'espace qu'il vous faut.",
-    "listings": "annonces"
+    "Maisons": "Maisons",
+    "Appartements": "Appartements",
+    "Chambres": "Chambres",
+    "Villas": "Villas",
+    "Bureaux": "Bureaux",
+    "Boutiques": "Boutiques"
   },
   "cities": {
-    "tag": "Destinations populaires",
-    "title": "Explorez par ville",
-    "subtitle": "Trouvez un logement dans les plus grandes villes de Guinée.",
-    "properties": "biens",
-    "inCity": "Logements à {{city}}"
+    "Conakry": "Conakry",
+    "Kankan": "Kankan",
+    "Kindia": "Kindia",
+    "Nzérékoré": "Nzérékoré",
+    "Labé": "Labé",
+    "Mamou": "Mamou",
+    "Boké": "Boké"
   },
   "howItWorks": {
     "tag": "Processus simple",
     "title": "Comment fonctionne MansaRent",
     "subtitle": "Trois étapes simples entre vous et votre prochain logement.",
-    "step1": { "title": "Rechercher des biens", "desc": "Filtrez par ville, type et budget pour trouver les espaces qui vous correspondent." },
-    "step2": { "title": "Contacter le propriétaire", "desc": "Échangez avec des propriétaires vérifiés grâce à la messagerie intégrée." },
-    "step3": { "title": "Emménager", "desc": "Convenez des modalités, signez et installez-vous en toute confiance." }
+    "step1": {
+      "title": "Rechercher des biens",
+      "desc": "Filtrez par ville, type et budget pour trouver les espaces qui vous correspondent."
+    },
+    "step2": {
+      "title": "Contacter le propriétaire",
+      "desc": "Échangez avec des propriétaires vérifiés grâce à la messagerie intégrée."
+    },
+    "step3": {
+      "title": "Emménager",
+      "desc": "Convenez des modalités, signez et installez-vous en toute confiance."
+    }
   },
   "whyChoose": {
     "tag": "Pourquoi MansaRent",
     "title": "Conçu pour les locataires en Guinée",
     "subtitle": "Une façon plus sûre, plus simple et plus intelligente de louer.",
     "features": {
-      "verified": { "title": "Annonces vérifiées", "desc": "Chaque bien est contrôlé avant sa publication." },
-      "trusted": { "title": "Propriétaires de confiance", "desc": "Louez auprès de propriétaires sérieux et vérifiés." },
-      "search": { "title": "Recherche facile", "desc": "Des filtres puissants pour trouver vite le bon logement." },
-      "messaging": { "title": "Messagerie intégrée", "desc": "Discutez avec les propriétaires directement dans l'application." },
-      "safe": { "title": "Plateforme sûre", "desc": "Communication sécurisée et protégée contre la fraude." },
-      "payments": { "title": "Paiements MansaSend", "desc": "Loyers et cautions simplifiés — bientôt disponible." }
+      "verified": {
+        "title": "Annonces vérifiées",
+        "desc": "Chaque bien est contrôlé avant sa publication."
+      },
+      "trusted": {
+        "title": "Propriétaires de confiance",
+        "desc": "Louez auprès de propriétaires sérieux et vérifiés."
+      },
+      "search": {
+        "title": "Recherche facile",
+        "desc": "Des filtres puissants pour trouver vite le bon logement."
+      },
+      "messaging": {
+        "title": "Messagerie intégrée",
+        "desc": "Discutez avec les propriétaires directement dans l'application."
+      },
+      "safe": {
+        "title": "Plateforme sûre",
+        "desc": "Communication sécurisée et protégée contre la fraude."
+      },
+      "payments": {
+        "title": "Paiements MansaSend",
+        "desc": "Loyers et cautions simplifiés — bientôt disponible."
+      }
     }
   },
   "featured": {
@@ -82,10 +113,22 @@
     "title": "Publiez une fois. Touchez tout le monde.",
     "subtitle": "Transformez vos espaces vides en revenus. MansaRent donne aux propriétaires les outils pour annoncer, gérer et louer — rapidement.",
     "benefits": {
-      "reach": { "title": "Touchez plus de locataires", "desc": "Présentez vos biens à des milliers de locataires actifs." },
-      "easy": { "title": "Publiez facilement", "desc": "Mettez un bien en ligne en quelques minutes depuis votre téléphone." },
-      "visibility": { "title": "Visibilité premium", "desc": "Placez vos annonces en tête des résultats de recherche." },
-      "analytics": { "title": "Tableau de bord analytique", "desc": "Suivez vues, contacts et performances en temps réel." }
+      "reach": {
+        "title": "Touchez plus de locataires",
+        "desc": "Présentez vos biens à des milliers de locataires actifs."
+      },
+      "easy": {
+        "title": "Publiez facilement",
+        "desc": "Mettez un bien en ligne en quelques minutes depuis votre téléphone."
+      },
+      "visibility": {
+        "title": "Visibilité premium",
+        "desc": "Placez vos annonces en tête des résultats de recherche."
+      },
+      "analytics": {
+        "title": "Tableau de bord analytique",
+        "desc": "Suivez vues, contacts et performances en temps réel."
+      }
     },
     "cta": "Commencer à publier",
     "responseTime": "Temps de réponse moyen"
@@ -102,8 +145,12 @@
     "protectedTransaction": "Transaction protégée"
   },
   "testimonials": {
-    "tag": "Apprécié partout en Guinée",
-    "title": "Ce que dit notre communauté"
+    "role1": "Locataire · Conakry",
+    "role2": "Propriétaire · Kankan",
+    "role3": "Agente · Kindia",
+    "text1": "J'ai trouvé mon appartement en trois jours. La messagerie intégrée a tout rendu rapide et simple.",
+    "text2": "J'ai publié deux maisons et trouvé des locataires en une semaine. Le tableau de bord me montre qui est intéressé.",
+    "text3": "MansaRent donne une vraie visibilité à mes annonces. Les badges vérifiés instaurent la confiance immédiatement."
   },
   "propertyCard": {
     "perMonth": "/mois",
@@ -363,15 +410,6 @@
     "Bureau": "Bureau",
     "Boutique": "Boutique"
   },
-  "cities": {
-    "Conakry": "Conakry",
-    "Kankan": "Kankan",
-    "Kindia": "Kindia",
-    "Nzérékoré": "Nzérékoré",
-    "Labé": "Labé",
-    "Mamou": "Mamou",
-    "Boké": "Boké"
-  },
   "rentalTypes": {
     "longStay": "Location longue durée",
     "shortStay": "Court séjour"
@@ -403,24 +441,8 @@
     "furnished": "Meublé",
     "economical": "Économique"
   },
-  "categories": {
-    "Maisons": "Maisons",
-    "Appartements": "Appartements",
-    "Chambres": "Chambres",
-    "Villas": "Villas",
-    "Bureaux": "Bureaux",
-    "Boutiques": "Boutiques"
-  },
   "cityCards": {
     "properties": "{{count}} biens"
-  },
-  "testimonials": {
-    "role1": "Locataire · Conakry",
-    "role2": "Propriétaire · Kankan",
-    "role3": "Agente · Kindia",
-    "text1": "J'ai trouvé mon appartement en trois jours. La messagerie intégrée a tout rendu rapide et simple.",
-    "text2": "J'ai publié deux maisons et trouvé des locataires en une semaine. Le tableau de bord me montre qui est intéressé.",
-    "text3": "MansaRent donne une vraie visibilité à mes annonces. Les badges vérifiés instaurent la confiance immédiatement."
   },
   "landlordBios": {
     "bio1": "Propriétaire de plusieurs biens à Conakry. Réactif et à l'écoute pour des locations sereines.",
@@ -436,17 +458,166 @@
     "rv5": "Très bonne agente, à l'écoute et honnête."
   },
   "seedProperties": {
-    "p1": { "title": "Maison moderne 3 chambres", "neighborhood": "Kipé" },
-    "p2": { "title": "Appartement lumineux en ville", "neighborhood": "Kaloum" },
-    "p3": { "title": "Villa de luxe en bord de mer", "neighborhood": "Camayenne" },
-    "p4": { "title": "Studio cosy meublé", "neighborhood": "Ratoma" },
-    "p5": { "title": "Bureau en centre-ville", "neighborhood": "Kaloum" },
-    "p6": { "title": "Maison familiale avec jardin", "neighborhood": "Centre" },
-    "p7": { "title": "Appartement meublé tout confort", "neighborhood": "Dixinn" },
-    "p8": { "title": "Villa avec piscine privée", "neighborhood": "Kipé" },
-    "p9": { "title": "Chambre étudiante calme", "neighborhood": "Centre" },
-    "p10": { "title": "Boutique commerciale Madina", "neighborhood": "Madina" },
-    "p11": { "title": "Appartement vue sur mer", "neighborhood": "Corniche" },
-    "p12": { "title": "Maison spacieuse à Labé", "neighborhood": "Centre" }
+    "p1": {
+      "title": "Maison moderne 3 chambres",
+      "neighborhood": "Kipé"
+    },
+    "p2": {
+      "title": "Appartement lumineux en ville",
+      "neighborhood": "Kaloum"
+    },
+    "p3": {
+      "title": "Villa de luxe en bord de mer",
+      "neighborhood": "Camayenne"
+    },
+    "p4": {
+      "title": "Studio cosy meublé",
+      "neighborhood": "Ratoma"
+    },
+    "p5": {
+      "title": "Bureau en centre-ville",
+      "neighborhood": "Kaloum"
+    },
+    "p6": {
+      "title": "Maison familiale avec jardin",
+      "neighborhood": "Centre"
+    },
+    "p7": {
+      "title": "Appartement meublé tout confort",
+      "neighborhood": "Dixinn"
+    },
+    "p8": {
+      "title": "Villa avec piscine privée",
+      "neighborhood": "Kipé"
+    },
+    "p9": {
+      "title": "Chambre étudiante calme",
+      "neighborhood": "Centre"
+    },
+    "p10": {
+      "title": "Boutique commerciale Madina",
+      "neighborhood": "Madina"
+    },
+    "p11": {
+      "title": "Appartement vue sur mer",
+      "neighborhood": "Corniche"
+    },
+    "p12": {
+      "title": "Maison spacieuse à Labé",
+      "neighborhood": "Centre"
+    }
+  },
+  "shell": {
+    "signIn": "Se connecter",
+    "tabs": {
+      "search": "Recherche",
+      "favorites": "Favoris",
+      "discover": "Découvrir",
+      "messages": "Messages",
+      "profile": "Profil"
+    },
+    "menu": {
+      "help": "Aide & Support"
+    },
+    "discover": {
+      "title": "Découvrir",
+      "subtitle": "Des contacts et sélections pour emménager plus vite",
+      "findAgent": "Trouver un agent",
+      "findAgentSub": "Échangez avec des agents vérifiés près de chez vous.",
+      "findLandlord": "Trouver un propriétaire",
+      "findLandlordSub": "Contactez directement les propriétaires.",
+      "people": "Agents & propriétaires",
+      "moreWays": "Plus de découvertes",
+      "featured": "Annonces en vedette",
+      "featuredSub": "Sélectionnées pour vous",
+      "newListings": "Nouvelles annonces",
+      "newListingsSub": "Biens récents dans votre zone",
+      "tips": "Conseils immo",
+      "tipsSub": "Apprenez et inspirez-vous",
+      "viewAll": "Tout voir",
+      "becomeTitle": "Devenir agent",
+      "becomeSub": "Publiez des annonces et gagnez la confiance sur MansaRent.",
+      "formName": "Nom complet",
+      "formNamePh": "Entrez votre nom complet",
+      "formPhone": "Téléphone",
+      "formPhonePh": "+224 6XX XX XX XX",
+      "formCity": "Ville",
+      "formRole": "Je m'inscris comme",
+      "roleAgent": "Agent",
+      "roleOwner": "Propriétaire",
+      "formBio": "Courte bio (optionnel)",
+      "formBioPh": "Expérience, zones couvertes…",
+      "submit": "S'inscrire",
+      "formError": "Le nom et le téléphone sont requis.",
+      "success": "Bienvenue {{name}} ! Votre page agent est en ligne."
+    },
+    "profile": {
+      "loginTitle": "Votre compte",
+      "loginSubtitle": "Connectez-vous pour gérer annonces, messages et alertes.",
+      "saved": "Annonces sauvegardées",
+      "notifications": "Notifications",
+      "language": "Langue",
+      "help": "Aide & Support",
+      "signOut": "Déconnexion"
+    },
+    "notifs": {
+      "chat": "Chat",
+      "notifs": "Notifications",
+      "empty": "Aucune notification",
+      "emptyHint": "Baisses de prix, messages et visites apparaîtront ici.",
+      "seedMsg": "Nouveau message",
+      "seedMsgText": "{{name}} vous a envoyé un message",
+      "seedPrice": "Baisse de prix",
+      "seedPriceText": "Prix réduit sur 3 biens consultés",
+      "seedFav": "Sauvegardé",
+      "seedFavText": "Vous avez sauvegardé un bien à Kipé",
+      "seedViews": "Activité d'annonce",
+      "seedViewsText": "Votre annonce a reçu 12 nouvelles vues"
+    },
+    "stats": {
+      "views": "vues",
+      "saves": "favoris",
+      "daysOn": "jours sur MansaRent",
+      "updated": "Mis à jour",
+      "lastActive": "Actif {{when}}"
+    },
+    "install": {
+      "title": "Installer MansaRent",
+      "sub": "Accès rapide, fonctionne hors-ligne",
+      "btn": "Installer",
+      "dismiss": "Plus tard"
+    },
+    "favTabs": {
+      "properties": "Annonces",
+      "agents": "Agents"
+    },
+    "admin": {
+      "title": "Administration",
+      "subtitle": "APIs, contenus et images — sans redéployer.",
+      "needBackend": "Connectez le backend (VITE_API_URL) pour gérer le site.",
+      "needRole": "Réservé aux comptes administrateurs.",
+      "tabs": {
+        "integrations": "APIs",
+        "content": "Contenus"
+      },
+      "enabled": "Activé",
+      "save": "Enregistrer",
+      "saved": "Enregistré",
+      "error": "Échec de l'enregistrement.",
+      "integSubtitle": "Clés chiffrées, prioritaires sur le .env, appliquées aussitôt.",
+      "secretSet": "défini",
+      "secretEmpty": "vide",
+      "announcement": "Bandeau d'annonce",
+      "annFr": "Texte (français)",
+      "annEn": "Texte (anglais)",
+      "heroImage": "Image hero",
+      "upload": "Envoyer une image",
+      "uploading": "Envoi…",
+      "categories": "Images des catégories",
+      "contact": "Coordonnées",
+      "phone": "Téléphone",
+      "email": "E-mail",
+      "viewSite": "Appliquer et voir"
+    }
   }
 }
