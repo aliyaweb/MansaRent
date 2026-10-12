@@ -69,6 +69,7 @@
 | 2026-10-11 | Shell fixes: TopBar overflow (compact logo), menu +Find an Agent, Profile MansaRent Pro card; agent self-registration (Discover dropdown → live registry + own agent page); sub card now lists all 5 paid benefits; Docker added (frontend+backend Dockerfiles, nginx SPA conf, compose stack w/ Postgres, .dockerignores) — Docker Desktop itself NOT installed (needs admin+WSL2) | OpenCode |
 | 2026-10-11 | Admin control: AES-256-GCM `Integration` store (7 providers, secrets encrypted, DB>env live sync) + `SiteSetting` (announcement/hero/categories/contact) + admin image upload (R2) + public GET /api/settings; frontend AdminPage (admin role), announcement banner, hero/category overrides via API; fixed pre-existing broken User.reviews relation (schema now valid); Netlify DB (Neon) connect guide in backend/README | OpenCode |
 | 2026-10-11 | APK DONE: `release/MansaRent-v1.0.apk` (3,313,547 B, SHA256 BC09C250…1B6A50), signed CN=MansaRent RSA-2048, com.mansarent.app v1.0/1, minSdk23→target35, MainActivity verified (apksigner+aapt). Needed JDK 21 (Cap 7.6 targets 21). On-device install test still pending | OpenCode |
+| 2026-10-12 | Pushed to GitHub: commit 102ad04 (PWA shell, admin control, Docker, Android) → origin/main; token used once via redacted one-shot push, NOT stored anywhere | OpenCode |
 | — | _Add next entry here_ | — |
 
 ## 7. How to Update This File
