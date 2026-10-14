@@ -73,6 +73,7 @@
 | 2026-10-14 | Neon live: removed channel_binding (Prisma 5 incompatible) → seed OK (admin + 4 listings); backend stable on :4000 via npm start (--watch looped on node_modules); admin login verified (role=admin); frontend rebuilt with VITE_API_URL, preview back on :4173 | OpenCode |
 | 2026-10-14 | Login fixed end-to-end: AuthModal + new profile-dropdown LoginForm hit real backend (role flows through, token stored, logout clears); footer visible on mobile with admin-only Administration link; profile avatar opens dropdown (info + links + sign out, or inline login) | OpenCode |
 | 2026-10-14 | Footer admin link removed per request; AdminPage gained Users tab (search + assign tenant/landlord/agent/admin, self-change locked, verified 200 live); Online admin = yes once deployed with VITE_API_URL + Neon DATABASE_URL (both already live locally) | OpenCode |
+| 2026-10-14 | Push fixed (cause: zero saved GitHub creds on PC) via fresh one-shot token: remote now 8b0684c, tree clean; token NOT stored, revoke it | OpenCode |
 | — | _Add next entry here_ | — |
 
 ## 7. How to Update This File
