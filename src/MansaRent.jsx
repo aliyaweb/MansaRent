@@ -4,12 +4,12 @@ import {
   Menu, X, Search, MapPin, Home, Building2, Bed, Bath, Briefcase, Store,
   DoorOpen, Hotel, ShieldCheck, Users, Wallet, BarChart3,
   Star, Facebook, Instagram, ArrowRight, ArrowLeft, Sparkles, Check,
-  TrendingUp, Eye, Heart, Phone, ChevronRight, SlidersHorizontal,
+  TrendingUp, Eye, Heart, Phone, ChevronRight, ChevronDown, SlidersHorizontal,
   ImagePlus, Maximize2, User, LogOut, Plus, Mail, Lock, Square,
   MessageSquare, Send, CreditCard, Smartphone, Clock, Crown, BadgeCheck,
   Bell, Compass, CircleUserRound, Download, History, Settings, LifeBuoy, Activity
 } from "lucide-react";
-import { PaymentAPI, SettingsAPI, AdminAPI } from "./services/api.js";
+import { PaymentAPI, SettingsAPI, AdminAPI, AuthAPI } from "./services/api.js";
 
 const VILLES_KEYS = ["Conakry", "Kankan", "Kindia", "Nzérékoré", "Labé", "Mamou", "Boké"];
 const TYPES_KEYS = ["Maison", "Appartement", "Chambre", "Villa", "Bureau", "Boutique"];
@@ -118,7 +118,7 @@ function GlobalStyles() {
       @import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
       .mr-display { font-family: 'Bricolage Grotesque', ui-sans-serif, system-ui, sans-serif; letter-spacing: -0.02em; }
       .mr-body, .mr-root { font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif; }
-      .mr-root { -webkit-font-smoothing: antialiased; }
+      .mr-root { -webkit-font-smoothing: antialiased; overflow-x: clip; }
       @keyframes mrUp { from { opacity:0; transform:translateY(24px);} to {opacity:1; transform:translateY(0);} }
       .mr-reveal { opacity:0; } .mr-reveal.mr-in { animation: mrUp .65s cubic-bezier(.2,.7,.2,1) forwards; }
       @keyframes mrFloat { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-10px);} }
@@ -200,6 +200,26 @@ function Toast() {
   );
 }
 
+const NAV_GROUPS = [
+  { key: "nav.home", action: () => ({ name: "home" }) },
+  {
+    key: "nav.properties", action: () => ({ name: "listings", reset: true }),
+    children: [
+      ["nav.properties", () => ({ name: "listings", reset: true })],
+      ["nav.shortStay", () => ({ name: "listings", preset: { ...EMPTY_FILTERS, rental: "shortStay" } })],
+      ["nav.longStay", () => ({ name: "listings", preset: { ...EMPTY_FILTERS, rental: "longStay" } })],
+    ],
+  },
+  { key: "nav.agents", action: () => ({ name: "home", anchor: "agents" }) },
+  {
+    key: "nav.contact", action: () => ({ name: "home", anchor: "contact" }),
+    children: [
+      ["nav.contact", () => ({ name: "home", anchor: "contact" })],
+      ["nav.about", () => ({ name: "home", anchor: "apropos" })],
+    ],
+  },
+];
+// Flat list kept for any legacy usage (mobile drawer uses NAV_GROUPS).
 const NAV = [
   ["nav.home", () => ({ name: "home" })],
   ["nav.properties", () => ({ name: "listings", reset: true })],
@@ -210,10 +230,80 @@ const NAV = [
   ["nav.contact", () => ({ name: "home", anchor: "contact" })],
 ];
 
+function NavDesktopItem({ g, go, t, openKey, setOpenKey }) {
+  if (!g.children) {
+    return (
+      <li>
+        <button onClick={() => { go(g.action); setOpenKey(null); }} className="text-sm font-medium text-gray-600 transition-colors hover:text-teal-700">{t(g.key)}</button>
+      </li>
+    );
+  }
+  const open = openKey === g.key;
+  return (
+    <li className="relative" onMouseEnter={() => setOpenKey(g.key)} onMouseLeave={() => setOpenKey(null)}>
+      <div className="flex items-center gap-0.5">
+        <button onClick={() => { go(g.action); setOpenKey(null); }} className="text-sm font-medium text-gray-600 transition-colors hover:text-teal-700">{t(g.key)}</button>
+        <button onClick={() => setOpenKey(open ? null : g.key)} aria-label={t(g.key)} aria-expanded={open} className="grid h-6 w-6 place-items-center rounded-md text-gray-400 hover:text-teal-700">
+          <ChevronDown size={14} className={`transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
+        </button>
+      </div>
+      <div className={`absolute left-0 top-full z-50 pt-2 transition-all duration-150 ${open ? "visible translate-y-0 opacity-100" : "invisible -translate-y-1 opacity-0"}`}>
+        <div className="w-52 overflow-hidden rounded-2xl bg-white p-1.5 shadow-xl ring-1 ring-gray-100">
+          {g.children.map(([ck, cfn]) => (
+            <button key={ck} onClick={() => { go(cfn); setOpenKey(null); }} className="flex w-full items-center justify-between rounded-xl px-3.5 py-2.5 text-left text-sm font-medium text-gray-600 transition hover:bg-teal-50 hover:text-teal-700">
+              {t(ck)} <ChevronRight size={15} className="text-gray-300" />
+            </button>
+          ))}
+        </div>
+      </div>
+    </li>
+  );
+}
+
+function NavDrawerGroups({ go, t, setOpen }) {
+  const [expanded, setExpanded] = useState(null);
+  return (
+    <>
+      {NAV_GROUPS.map((g) => (
+        <li key={g.key}>
+          {g.children ? (
+            <>
+              <div className="flex w-full items-center gap-1 rounded-xl hover:bg-teal-50">
+                <button onClick={() => go(g.action)} className="flex min-w-0 flex-1 items-center rounded-xl px-4 py-3.5 text-left text-base font-medium text-gray-700 hover:text-teal-700">
+                  {t(g.key)}
+                </button>
+                <button onClick={() => setExpanded(expanded === g.key ? null : g.key)} aria-label={t(g.key)} aria-expanded={expanded === g.key} className="grid h-10 w-10 shrink-0 place-items-center rounded-xl text-gray-400 hover:text-teal-700">
+                  <ChevronDown size={18} className={`transition-transform duration-200 ${expanded === g.key ? "rotate-180" : ""}`} />
+                </button>
+              </div>
+              <div className={`grid transition-all duration-200 ${expanded === g.key ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"}`}>
+                <div className="overflow-hidden">
+                  <div className="ml-4 flex flex-col border-l-2 border-teal-100 pl-2">
+                    {g.children.map(([ck, cfn]) => (
+                      <button key={ck} onClick={() => go(cfn)} className="flex w-full items-center justify-between rounded-xl px-4 py-3 text-left text-[15px] font-medium text-gray-600 hover:bg-teal-50 hover:text-teal-700">
+                        {t(ck)} <ChevronRight size={17} className="text-gray-300" />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </>
+          ) : (
+            <button onClick={() => go(g.action)} className="flex w-full items-center justify-between rounded-xl px-4 py-3.5 text-left text-base font-medium text-gray-700 hover:bg-teal-50 hover:text-teal-700">
+              {t(g.key)} <ChevronRight size={18} className="text-gray-300" />
+            </button>
+          )}
+        </li>
+      ))}
+    </>
+  );
+}
+
 function Navbar() {
   const { navigate, setFilters, openAuth, favorites, user, logout, conversations, i18n } = useApp();
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
+  const [dropOpen, setDropOpen] = useState(null);
   const [scrolled, setScrolled] = useState(false);
   const [langOpen, setLangOpen] = useState(false);
   const unread = conversations.filter((c) => c.unread).length;
@@ -237,10 +327,8 @@ function Navbar() {
       <nav className="mx-auto flex max-w-7xl items-center justify-between px-5 py-3.5 lg:px-8">
         <Logo />
         <ul className="hidden items-center gap-6 lg:flex">
-          {NAV.map(([key, fn]) => (
-            <li key={key}>
-              <button onClick={() => go(fn)} className="text-sm font-medium text-gray-600 transition-colors hover:text-teal-700">{t(key)}</button>
-            </li>
+          {NAV_GROUPS.map((g) => (
+            <NavDesktopItem key={g.key} g={g} go={go} t={t} openKey={dropOpen} setOpenKey={setDropOpen} />
           ))}
         </ul>
         <div className="hidden items-center gap-2.5 lg:flex">
@@ -298,14 +386,8 @@ function Navbar() {
             <Logo />
             <button onClick={() => setOpen(false)} className="grid h-10 w-10 place-items-center rounded-xl text-gray-700 ring-1 ring-gray-200" aria-label={t("nav.close")}><X size={20} /></button>
           </div>
-          <ul className="flex flex-col px-3 py-3">
-            {NAV.map(([key, fn]) => (
-              <li key={key}>
-                <button onClick={() => go(fn)} className="flex w-full items-center justify-between rounded-xl px-4 py-3.5 text-left text-base font-medium text-gray-700 hover:bg-teal-50 hover:text-teal-700">
-                  {t(key)} <ChevronRight size={18} className="text-gray-300" />
-                </button>
-              </li>
-            ))}
+          <ul className="flex flex-col overflow-y-auto px-3 py-3">
+            <NavDrawerGroups go={go} t={t} setOpen={setOpen} />
             <li>
               <button onClick={() => { navigate("messages"); setOpen(false); }} className="flex w-full items-center justify-between rounded-xl px-4 py-3.5 text-left text-base font-medium text-gray-700 hover:bg-teal-50">
                 {t("nav.messages")} <span className="flex items-center gap-1 text-teal-700"><MessageSquare size={16} /> {unread > 0 ? unread : ""}</span>
@@ -1124,17 +1206,33 @@ function GoogleAuthButton() {
 }
 
 function AuthModal() {
-  const { authOpen, closeAuth, login } = useApp();
+  const { authOpen, closeAuth, login, loginWithPassword } = useApp();
   const { t } = useTranslation();
   const [tab, setTab] = useState("login");
   const [form, setForm] = useState({ name: "", email: "", password: "" });
-  useEffect(() => { if (authOpen) { setTab("login"); setForm({ name: "", email: "", password: "" }); } }, [authOpen]);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  useEffect(() => { if (authOpen) { setTab("login"); setForm({ name: "", email: "", password: "" }); setError(""); setBusy(false); } }, [authOpen]);
   if (!authOpen) return null;
   const set = (k, v) => setForm((f) => ({ ...f, [k]: v }));
   const inp = "w-full rounded-xl border-0 bg-gray-50 py-3 pl-10 pr-3 text-sm text-gray-800 ring-1 ring-gray-200 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500";
-  const submit = () => {
-    const name = (tab === "register" ? form.name : "") || form.email.split("@")[0] || t("auth.demoUser");
-    login({ name, email: form.email });
+  const submit = async () => {
+    setError("");
+    if (!form.email.trim() || !form.password) return;
+    if (import.meta.env.VITE_API_URL && tab === "register") {
+      setBusy(true);
+      try {
+        const r = await AuthAPI.register({ name: form.name.trim() || form.email.split("@")[0], email: form.email.trim(), password: form.password });
+        if (r.token) window.__MR_TOKEN__ = r.token;
+        login(r.user);
+      } catch (e) { setError(e.message); }
+      setBusy(false);
+      return;
+    }
+    setBusy(true);
+    const res = await loginWithPassword(form.email, form.password, tab === "register" ? form.name : "");
+    setBusy(false);
+    if (!res.ok && res.error !== "…") setError(res.error);
   };
   return (
     <div className="fixed inset-0 z-[70] flex items-center justify-center p-4">
@@ -1156,7 +1254,8 @@ function AuthModal() {
           <div className="relative"><Mail size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" /><input className={inp} placeholder={t("auth.email")} value={form.email} onChange={(e) => set("email", e.target.value)} /></div>
           <div className="relative"><Lock size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" /><input type="password" className={inp} placeholder={t("auth.password")} value={form.password} onChange={(e) => set("password", e.target.value)} /></div>
         </div>
-        <Btn variant="solid" className="mt-5 w-full py-3.5" onClick={submit}>{tab === "login" ? t("auth.login") : t("auth.register")}</Btn>
+        <Btn variant="solid" className="mt-5 w-full py-3.5" onClick={submit} disabled={busy}>{tab === "login" ? t("auth.login") : t("auth.register")}</Btn>
+        {error !== "" && <p className="mt-3 text-center text-xs font-semibold text-rose-600">{error}</p>}
         <p className="mt-4 flex items-center justify-center gap-1.5 text-center text-xs text-gray-400"><Clock size={12} /> {t("auth.trialNote", { price: formatGNF(SUBSCRIPTION_PRICE) })}</p>
       </div>
     </div>
@@ -1285,8 +1384,8 @@ function MessagesPage() {
   const send = () => { if (!draft.trim()) return; sendMessage(activeId, draft); setDraft(""); };
 
   return (
-    <div className="min-h-screen bg-gray-50/70">
-      <div className="mx-auto max-w-6xl px-5 py-8 lg:px-8 lg:py-12">
+    <div className="min-h-screen overflow-x-clip bg-gray-50/70">
+      <div className="mx-auto w-full max-w-6xl min-w-0 px-5 py-8 lg:px-8 lg:py-12">
         <h1 className="mr-display text-2xl font-extrabold text-gray-900 sm:text-3xl">{t("messages.title")}</h1>
         <p className="mt-1 text-sm text-gray-500">{t("messages.subtitle")}</p>
         <div className="mt-5 grid grid-cols-2 gap-1 rounded-full bg-gray-100 p-1">
@@ -1307,44 +1406,45 @@ function MessagesPage() {
             <Btn variant="solid" className="mt-5 px-6 py-3" onClick={() => navigate("listings")}>{t("messages.browseListings")}</Btn>
           </div>
         ) : (
-          <div className="mt-6 grid gap-4 lg:grid-cols-[320px_1fr]">
-            <div className="rounded-3xl bg-white p-2 ring-1 ring-gray-100">
+          <div className="mt-6 grid min-w-0 gap-4 lg:grid-cols-[320px_minmax(0,1fr)]">
+            <div className={`min-w-0 rounded-3xl bg-white p-2 ring-1 ring-gray-100 ${activeId ? "hidden lg:block" : "block"}`}>
               {conversations.map((c) => (
-                <button key={c.id} onClick={() => setActiveId(c.id)} className={`flex w-full items-center gap-3 rounded-2xl px-3 py-3 text-left transition ${activeId === c.id ? "bg-teal-50" : "hover:bg-gray-50"}`}>
+                <button key={c.id} onClick={() => setActiveId(c.id)} className={`flex w-full min-w-0 items-center gap-3 rounded-2xl px-3 py-3 text-left transition ${activeId === c.id ? "bg-teal-50" : "hover:bg-gray-50"}`}>
                   <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-teal-700 text-sm font-bold text-white">{c.agentName.charAt(0)}</span>
                   <span className="min-w-0 flex-1">
-                    <span className="flex items-center justify-between gap-2"><span className="mr-display truncate font-bold text-gray-900">{c.agentName}</span>{c.unread && <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-amber-500" />}</span>
+                    <span className="flex items-center justify-between gap-2"><span className="mr-display min-w-0 truncate font-bold text-gray-900">{c.agentName}</span>{c.unread && <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-amber-500" />}</span>
                     <span className="block truncate text-xs text-gray-500">{c.messages[c.messages.length - 1]?.text}</span>
                   </span>
                 </button>
               ))}
             </div>
-            <div className="flex h-[560px] flex-col overflow-hidden rounded-3xl bg-white ring-1 ring-gray-100">
+            <div className={`h-[calc(100dvh-330px)] max-h-[600px] min-h-[430px] min-w-0 flex-col overflow-hidden rounded-3xl bg-white ring-1 ring-gray-100 lg:h-[560px] lg:max-h-none ${activeId ? "flex" : "hidden lg:flex"}`}>
               {active ? (
                 <>
-                  <div className="flex items-center gap-3 border-b border-gray-100 px-5 py-4">
-                    <span className="grid h-10 w-10 place-items-center rounded-full bg-teal-700 text-sm font-bold text-white">{active.agentName.charAt(0)}</span>
+                  <div className="flex min-w-0 items-center gap-2.5 border-b border-gray-100 px-4 py-3.5 sm:px-5 sm:py-4">
+                    <button onClick={() => setActiveId(null)} className="grid h-9 w-9 shrink-0 place-items-center rounded-xl text-gray-500 ring-1 ring-gray-200 hover:text-teal-700 lg:hidden" aria-label={t("detail.back")}><ArrowLeft size={17} /></button>
+                    <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-teal-700 text-sm font-bold text-white">{active.agentName.charAt(0)}</span>
                     <div className="min-w-0 flex-1">
-                      <div className="mr-display font-bold text-gray-900">{active.agentName}</div>
-                      <button onClick={() => navigate("detail", { id: active.propertyId })} className="truncate text-xs text-teal-700 hover:underline">{t("messages.about", { title: active.propertyTitle })}</button>
+                      <div className="mr-display truncate font-bold text-gray-900">{active.agentName}</div>
+                      <button onClick={() => navigate("detail", { id: active.propertyId })} className="block w-full max-w-full truncate text-left text-xs text-teal-700 hover:underline">{t("messages.about", { title: active.propertyTitle })}</button>
                     </div>
-                    <span className="flex items-center gap-1 rounded-full bg-teal-50 px-2.5 py-1 text-xs font-semibold text-teal-700"><ShieldCheck size={12} /> {t("messages.verified")}</span>
+                    <span className="hidden shrink-0 items-center gap-1 rounded-full bg-teal-50 px-2.5 py-1 text-xs font-semibold text-teal-700 sm:flex"><ShieldCheck size={12} /> {t("messages.verified")}</span>
                   </div>
-                  <div className="flex-1 space-y-3 overflow-y-auto bg-gray-50/60 px-5 py-5">
+                  <div className="min-w-0 flex-1 space-y-3 overflow-y-auto overscroll-contain bg-gray-50/60 px-4 py-5 sm:px-5">
                     {active.messages.map((m) => (
-                      <div key={m.id} className={`flex ${m.from === "me" ? "justify-end" : "justify-start"}`}>
-                        <div className={`max-w-[78%] rounded-2xl px-4 py-2.5 text-sm ${m.from === "me" ? "bg-teal-700 text-white" : "bg-white text-gray-700 ring-1 ring-gray-100"}`}>{m.text}</div>
+                      <div key={m.id} className={`flex min-w-0 ${m.from === "me" ? "justify-end" : "justify-start"}`}>
+                        <div className={`min-w-0 max-w-[85%] break-words text-sm [overflow-wrap:anywhere] rounded-2xl px-4 py-2.5 sm:max-w-[78%] ${m.from === "me" ? "bg-teal-700 text-white" : "bg-white text-gray-700 ring-1 ring-gray-100"}`}>{m.text}</div>
                       </div>
                     ))}
                     <div ref={endRef} />
                   </div>
-                  <div className="flex items-center gap-2 border-t border-gray-100 p-3">
-                    <input value={draft} onChange={(e) => setDraft(e.target.value)} onKeyDown={(e) => e.key === "Enter" && send()} placeholder={t("messages.typeMessage")} className="flex-1 rounded-full border-0 bg-gray-50 px-4 py-3 text-sm ring-1 ring-gray-200 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500" />
+                  <div className="flex items-center gap-2 border-t border-gray-100 p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+                    <input value={draft} onChange={(e) => setDraft(e.target.value)} onKeyDown={(e) => e.key === "Enter" && send()} placeholder={t("messages.typeMessage")} className="min-w-0 flex-1 rounded-full border-0 bg-gray-50 px-4 py-3 text-sm ring-1 ring-gray-200 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500" />
                     <button onClick={send} disabled={!draft.trim()} className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-teal-700 text-white transition hover:bg-teal-800 disabled:opacity-50" aria-label={t("messages.send")}><Send size={18} /></button>
                   </div>
                 </>
               ) : (
-                <div className="grid flex-1 place-items-center text-sm text-gray-400">{t("messages.selectConversation")}</div>
+                <div className="grid flex-1 place-items-center p-6 text-center text-sm text-gray-400">{t("messages.selectConversation")}</div>
               )}
             </div>
           </div>
@@ -1634,31 +1734,126 @@ function AnnouncementBar() {
   );
 }
 
+// ---- Formulaire de connexion compact (dropdown profil) ----
+function LoginForm({ onDone }) {
+  const { loginWithPassword, openAuth } = useApp();
+  const { t } = useTranslation();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const submit = async () => {
+    if (!email.trim() || !password) return;
+    setBusy(true); setError("");
+    const res = await loginWithPassword(email, password);
+    setBusy(false);
+    if (res.ok) { onDone && onDone(); }
+    else if (res.error !== "…") setError(res.error);
+  };
+  const inp = "w-full rounded-xl border-0 bg-gray-50 px-3.5 py-2.5 text-sm text-gray-800 ring-1 ring-gray-200 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500";
+  return (
+    <div>
+      <div className="space-y-2.5">
+        <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder={t("auth.email")} inputMode="email" className={inp} />
+        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} onKeyDown={(e) => e.key === "Enter" && submit()} placeholder={t("auth.password")} className={inp} />
+      </div>
+      {error !== "" && <p className="mt-2 text-xs font-semibold text-rose-600">{error}</p>}
+      <Btn variant="solid" className="mt-3 w-full py-2.5 text-sm" disabled={busy} onClick={submit}>{t("auth.login")}</Btn>
+      <button onClick={() => { onDone && onDone(); openAuth(); }} className="mt-2 w-full text-center text-xs font-bold text-teal-700 hover:underline">{t("auth.registerTab")}</button>
+    </div>
+  );
+}
+
 function TopBar() {
-  const { user, navigate, openAuth, i18n } = useApp();
+  const { user, navigate, openAuth, logout, i18n, setFilters } = useApp();
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
+  const [profOpen, setProfOpen] = useState(false);
+  const [expanded, setExpanded] = useState(null);
+  const goGroup = (fn) => {
+    const r = fn();
+    if (r.reset) setFilters(EMPTY_FILTERS);
+    if (r.preset) setFilters(r.preset);
+    navigate(r.name, r.anchor ? { anchor: r.anchor } : {});
+    setOpen(false);
+  };
   return (
     <>
       <header className="sticky top-0 z-40 overflow-hidden border-b border-gray-100 bg-white/95 backdrop-blur-md lg:hidden">
         <div className="flex items-center gap-2 px-3 py-2.5">
-          {user ? (
-            <button onClick={() => navigate("profile")} aria-label={t("shell.tabs.profile")} className="shrink-0"><Avatar name={user.name} src={user.avatar} size={34} /></button>
-          ) : (
-            <button onClick={openAuth} className="flex shrink-0 items-center gap-1.5 rounded-full bg-teal-50 px-3 py-1.5 text-xs font-bold text-teal-700"><CircleUserRound size={18} /> {t("shell.signIn")}</button>
-          )}
+          <button onClick={() => setProfOpen(true)} aria-label={t("shell.tabs.profile")} className="shrink-0">
+            {user ? <Avatar name={user.name} src={user.avatar} size={34} /> : <span className="grid h-[34px] w-[34px] place-items-center rounded-full bg-teal-50 text-teal-700"><CircleUserRound size={22} /></span>}
+          </button>
           <span className="flex min-w-0 flex-1 justify-center"><Logo compact /></span>
           <button onClick={() => setOpen(true)} className="grid h-10 w-10 shrink-0 place-items-center rounded-xl text-gray-700 ring-1 ring-gray-200" aria-label={t("nav.menu")}><Menu size={20} /></button>
         </div>
       </header>
+      {profOpen && (
+        <div className="fixed inset-0 z-50 lg:hidden">
+          <div onClick={() => setProfOpen(false)} className="absolute inset-0 bg-gray-900/40" />
+          <div className="absolute left-3 top-3 w-72 rounded-3xl bg-white p-4 shadow-2xl ring-1 ring-gray-100">
+            <div className="flex items-center justify-between">
+              <span className="mr-display text-sm font-extrabold text-gray-900">{t("shell.tabs.profile")}</span>
+              <button onClick={() => setProfOpen(false)} className="grid h-9 w-9 place-items-center rounded-xl text-gray-500 hover:bg-gray-50" aria-label={t("nav.close")}><X size={18} /></button>
+            </div>
+            {user ? (
+              <div className="mt-2">
+                <div className="flex items-center gap-3 rounded-2xl bg-gray-50 p-3">
+                  <Avatar name={user.name} src={user.avatar} size={44} />
+                  <div className="min-w-0 flex-1">
+                    <div className="mr-display truncate text-sm font-extrabold text-gray-900">{user.name}</div>
+                    <div className="truncate text-xs text-gray-500">{user.email}</div>
+                    {user.role === "admin" && <span className="mt-1 inline-block rounded-full bg-teal-700 px-2 py-0.5 text-[10px] font-extrabold text-white">ADMIN</span>}
+                  </div>
+                </div>
+                {[
+                  ["profile", t("shell.tabs.profile"), () => navigate("profile")],
+                  ...(user.role === "admin" ? [["admin", t("shell.admin.title"), () => navigate("admin")]] : []),
+                ].map(([k, label, fn]) => (
+                  <button key={k} onClick={() => { fn(); setProfOpen(false); }} className="mt-1 flex w-full items-center justify-between rounded-2xl px-3 py-3 text-left text-sm font-bold text-gray-700 hover:bg-teal-50 hover:text-teal-700">{label}<ChevronRight size={16} className="text-gray-300" /></button>
+                ))}
+                <button onClick={() => { logout(); setProfOpen(false); }} className="mt-1 flex w-full items-center gap-2 rounded-2xl px-3 py-3 text-left text-sm font-bold text-rose-600 hover:bg-rose-50"><LogOut size={16} /> {t("shell.profile.signOut")}</button>
+              </div>
+            ) : (
+              <div className="mt-3"><LoginForm onDone={() => setProfOpen(false)} /></div>
+            )}
+          </div>
+        </div>
+      )}
       {open && (
         <div className="fixed inset-0 z-50 lg:hidden">
           <div onClick={() => setOpen(false)} className="absolute inset-0 bg-gray-900/40" />
-          <div className="absolute right-3 top-3 w-64 rounded-3xl bg-white p-2 shadow-2xl ring-1 ring-gray-100">
+          <div className="absolute right-3 top-3 max-h-[80dvh] w-64 overflow-y-auto rounded-3xl bg-white p-2 shadow-2xl ring-1 ring-gray-100">
             <div className="flex items-center justify-between px-3 py-2">
               <span className="mr-display text-sm font-extrabold text-gray-900">MansaRent</span>
               <button onClick={() => setOpen(false)} className="grid h-9 w-9 place-items-center rounded-xl text-gray-500 hover:bg-gray-50" aria-label={t("nav.close")}><X size={18} /></button>
             </div>
+            {NAV_GROUPS.map((g) => (
+              <div key={g.key}>
+                {g.children ? (
+                  <>
+                    <div className="flex w-full items-center gap-1 rounded-2xl hover:bg-teal-50">
+                      <button onClick={() => goGroup(g.action)} className="flex min-w-0 flex-1 items-center gap-3 rounded-2xl px-3 py-3 text-left text-sm font-semibold text-gray-700 hover:text-teal-700">{t(g.key)}</button>
+                      <button onClick={() => setExpanded(expanded === g.key ? null : g.key)} aria-label={t(g.key)} aria-expanded={expanded === g.key} className="grid h-10 w-10 shrink-0 place-items-center rounded-xl text-gray-400 hover:text-teal-700">
+                        <ChevronDown size={17} className={`transition-transform duration-200 ${expanded === g.key ? "rotate-180" : ""}`} />
+                      </button>
+                    </div>
+                    <div className={`grid transition-all duration-200 ${expanded === g.key ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"}`}>
+                      <div className="overflow-hidden">
+                        <div className="ml-4 flex flex-col border-l-2 border-teal-100 pl-2">
+                          {g.children.map(([ck, cfn]) => (
+                            <button key={ck} onClick={() => goGroup(cfn)} className="flex w-full items-center rounded-2xl px-3 py-2.5 text-left text-[13px] font-semibold text-gray-600 hover:bg-teal-50 hover:text-teal-700">{t(ck)}</button>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <button onClick={() => goGroup(g.action)} className="flex w-full items-center gap-3 rounded-2xl px-3 py-3 text-left text-sm font-semibold text-gray-700 hover:bg-teal-50 hover:text-teal-700">{t(g.key)}</button>
+                )}
+              </div>
+            ))}
+            <div className="mx-3 my-2 border-t border-gray-100" />
             {[
               ["post", <Plus key="i" size={17} />, t("nav.postListing")],
               ["subscribe", <Crown key="i" size={17} />, t("subscribe.title")],
@@ -1957,9 +2152,10 @@ function AdminPage() {
   const { t } = useTranslation();
   const hasBackend = !!import.meta.env.VITE_API_URL;
   const [tab, setTab] = useState("integrations");
-  const [integrations, setIntegrations] = useState(null);
-  const [drafts, setDrafts] = useState({});
+  const [integrations, setIntegrations] = useState(null);  const [drafts, setDrafts] = useState({});
   const [settings, setSettings] = useState(null);
+  const [users, setUsers] = useState(null);
+  const [userQuery, setUserQuery] = useState("");
   const [heroFile, setHeroFile] = useState(null);
   const [busy, setBusy] = useState(false);
 
@@ -1974,6 +2170,7 @@ function AdminPage() {
       setDrafts(d);
     }).catch(() => {});
     AdminAPI.settings().then((r) => setSettings(r.settings || {})).catch(() => {});
+    AdminAPI.users().then((r) => setUsers(r.users || [])).catch(() => {});
   }, [hasBackend, user?.role]);
 
   if (!hasBackend) return <div className="mx-auto max-w-2xl px-5 py-24 text-center"><p className="text-gray-500">{t("shell.admin.needBackend")}</p><Btn variant="ghost" className="mt-4 px-5 py-2.5" onClick={() => navigate("home")}>{t("detail.back")}</Btn></div>;
@@ -2003,6 +2200,13 @@ function AdminPage() {
     } catch { showToast(t("shell.admin.error")); }
     setBusy(false);
   };
+  const changeRole = async (id, role) => {
+    try {
+      await AdminAPI.setUserRole(id, role);
+      setUsers((us) => (us || []).map((u) => (u.id === id ? { ...u, role } : u)));
+      showToast(t("shell.admin.saved"));
+    } catch { showToast(t("shell.admin.error")); }
+  };
   const inp = "w-full rounded-xl border-0 bg-gray-50 px-4 py-2.5 text-sm text-gray-800 ring-1 ring-gray-200 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500";
   const lab = "mb-1 block text-xs font-semibold text-gray-500";
 
@@ -2011,8 +2215,8 @@ function AdminPage() {
       <button onClick={() => navigate("profile")} className="mb-5 inline-flex items-center gap-2 text-sm font-semibold text-gray-600 hover:text-teal-700"><ArrowLeft size={16} /> {t("detail.back")}</button>
       <h1 className="mr-display text-2xl font-extrabold text-gray-900 sm:text-3xl">{t("shell.admin.title")}</h1>
       <p className="mt-1 text-sm text-gray-500">{t("shell.admin.subtitle")}</p>
-      <div className="mt-5 flex gap-2">
-        {(["integrations", "content"]).map((k) => (
+      <div className="mt-5 flex flex-wrap gap-2">
+        {(["integrations", "users", "content"]).map((k) => (
           <button key={k} onClick={() => setTab(k)} className={`rounded-full px-5 py-2.5 text-sm font-bold ${tab === k ? "bg-teal-700 text-white" : "bg-white text-gray-600 ring-1 ring-gray-200"}`}>{t(`shell.admin.tabs.${k}`)}</button>
         ))}
       </div>
@@ -2039,6 +2243,27 @@ function AdminPage() {
               <Btn variant="solid" className="mt-4 px-6 py-2.5 text-sm" disabled={busy} onClick={() => saveInteg(it.provider)}>{t("shell.admin.save")}</Btn>
             </div>
           ))}
+        </div>
+      )}
+      {tab === "users" && (
+        <div className="mt-6 rounded-3xl bg-white p-5 ring-1 ring-gray-100">
+          <p className="text-sm text-gray-500">{t("shell.admin.usersSubtitle")}</p>
+          <input value={userQuery} onChange={(e) => { setUserQuery(e.target.value); AdminAPI.users({ q: e.target.value }).then((r) => setUsers(r.users || [])).catch(() => {}); }} placeholder={t("shell.admin.searchUsers")} className="mt-3 w-full rounded-xl border-0 bg-gray-50 px-4 py-2.5 text-sm text-gray-800 ring-1 ring-gray-200 focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500" />
+          <div className="mt-3 overflow-hidden rounded-2xl ring-1 ring-gray-100">
+            {(users || []).map((u) => (
+              <div key={u.id} className="flex items-center gap-3 border-b border-gray-50 px-4 py-3 last:border-0">
+                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-teal-700 text-xs font-bold text-white">{(u.name || "?").charAt(0).toUpperCase()}</span>
+                <span className="min-w-0 flex-1">
+                  <span className="mr-display block truncate text-sm font-bold text-gray-900">{u.name} {u.id === user.id && <span className="ml-1 rounded-full bg-amber-100 px-1.5 py-0.5 text-[10px] font-bold text-amber-700">{t("shell.admin.selfYou")}</span>}</span>
+                  <span className="block truncate text-xs text-gray-500">{u.email}</span>
+                </span>
+                <select value={u.role} disabled={u.id === user.id} onChange={(e) => changeRole(u.id, e.target.value)} title={t("shell.admin.usersSubtitle")} className="mr-sel shrink-0 appearance-none rounded-xl bg-gray-50 py-2 pl-3 pr-8 text-xs font-bold text-teal-700 ring-1 ring-gray-200 focus:outline-none focus:ring-2 focus:ring-teal-500 disabled:opacity-50">
+                  {(["tenant", "landlord", "agent", "admin"]).map((r) => (<option key={r} value={r}>{t(`shell.admin.roles.${r}`)}</option>))}
+                </select>
+              </div>
+            ))}
+            {users && users.length === 0 && <p className="px-4 py-8 text-center text-sm text-gray-400">—</p>}
+          </div>
         </div>
       )}
       {tab === "content" && settings && (
@@ -2144,7 +2369,25 @@ export default function MansaRent() {
     setAuthOpen(false);
     showToast(t("toast.welcome", { name: u.name }));
   };
-  const logout = () => { setUser(null); showToast(t("toast.loggedOut")); };
+  const logout = () => { window.__MR_TOKEN__ = null; setUser(null); showToast(t("toast.loggedOut")); };
+  // Connexion e-mail : backend réel si VITE_API_URL, sinon démo locale.
+  // Retourne { ok, error } — l'utilisateur backend inclut son rôle (admin…).
+  const loginWithPassword = async (email, password, name = "") => {
+    const em = (email || "").trim();
+    if (!em || !password) return { ok: false, error: "…" };
+    if (!import.meta.env.VITE_API_URL) {
+      login({ name: name || em.split("@")[0] || t("auth.demoUser"), email: em });
+      return { ok: true };
+    }
+    try {
+      const r = await AuthAPI.login(em, password);
+      if (r.token) window.__MR_TOKEN__ = r.token;
+      login(r.user);
+      return { ok: true };
+    } catch (e) {
+      return { ok: false, error: e.message };
+    }
+  };
 
   const startConversation = (p) => {
     const id = "conv-" + p.id;
@@ -2182,7 +2425,7 @@ export default function MansaRent() {
     properties, addProperty,
     favorites, toggleFavorite,
     filters, setFilters,
-    user, login, logout,
+    user, login, logout, loginWithPassword,
     authOpen, openAuth: () => setAuthOpen(true), closeAuth: () => setAuthOpen(false),
     toast, showToast,
     conversations, startConversation, sendMessage, markConversationRead,
@@ -2214,7 +2457,7 @@ export default function MansaRent() {
         <TopBar />
         <AnnouncementBar />
         <main className="pb-24 lg:pb-0">{page}</main>
-        <div className="hidden lg:block"><Footer /></div>
+        <div className="pb-24 lg:pb-0"><Footer /></div>
         <BottomNav />
         <InstallBanner />
         <AuthModal />

@@ -598,7 +598,8 @@
       "needRole": "Restricted to administrator accounts.",
       "tabs": {
         "integrations": "APIs",
-        "content": "Content"
+        "content": "Content",
+        "users": "Users"
       },
       "enabled": "Enabled",
       "save": "Save",
@@ -617,7 +618,16 @@
       "contact": "Contact info",
       "phone": "Phone",
       "email": "Email",
-      "viewSite": "Apply and view"
+      "viewSite": "Apply and view",
+      "usersSubtitle": "Grant access and assign roles: tenant, landlord, agent or admin.",
+      "searchUsers": "Search name or e-mail…",
+      "selfYou": "you",
+      "roles": {
+        "tenant": "Tenant",
+        "landlord": "Landlord",
+        "agent": "Agent",
+        "admin": "Admin"
+      }
     }
   }
 }

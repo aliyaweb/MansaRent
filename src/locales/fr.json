@@ -598,7 +598,8 @@
       "needRole": "Réservé aux comptes administrateurs.",
       "tabs": {
         "integrations": "APIs",
-        "content": "Contenus"
+        "content": "Contenus",
+        "users": "Utilisateurs"
       },
       "enabled": "Activé",
       "save": "Enregistrer",
@@ -617,7 +618,16 @@
       "contact": "Coordonnées",
       "phone": "Téléphone",
       "email": "E-mail",
-      "viewSite": "Appliquer et voir"
+      "viewSite": "Appliquer et voir",
+      "usersSubtitle": "Donnez l'accès et assignez les rôles : locataire, propriétaire, agent ou admin.",
+      "searchUsers": "Chercher nom ou e-mail…",
+      "selfYou": "vous",
+      "roles": {
+        "tenant": "Locataire",
+        "landlord": "Propriétaire",
+        "agent": "Agent",
+        "admin": "Admin"
+      }
     }
   }
 }

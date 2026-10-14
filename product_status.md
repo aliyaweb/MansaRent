@@ -70,6 +70,9 @@
 | 2026-10-11 | Admin control: AES-256-GCM `Integration` store (7 providers, secrets encrypted, DB>env live sync) + `SiteSetting` (announcement/hero/categories/contact) + admin image upload (R2) + public GET /api/settings; frontend AdminPage (admin role), announcement banner, hero/category overrides via API; fixed pre-existing broken User.reviews relation (schema now valid); Netlify DB (Neon) connect guide in backend/README | OpenCode |
 | 2026-10-11 | APK DONE: `release/MansaRent-v1.0.apk` (3,313,547 B, SHA256 BC09C250…1B6A50), signed CN=MansaRent RSA-2048, com.mansarent.app v1.0/1, minSdk23→target35, MainActivity verified (apksigner+aapt). Needed JDK 21 (Cap 7.6 targets 21). On-device install test still pending | OpenCode |
 | 2026-10-12 | Pushed to GitHub: commit 102ad04 (PWA shell, admin control, Docker, Android) → origin/main; token used once via redacted one-shot push, NOT stored anywhere | OpenCode |
+| 2026-10-14 | Neon live: removed channel_binding (Prisma 5 incompatible) → seed OK (admin + 4 listings); backend stable on :4000 via npm start (--watch looped on node_modules); admin login verified (role=admin); frontend rebuilt with VITE_API_URL, preview back on :4173 | OpenCode |
+| 2026-10-14 | Login fixed end-to-end: AuthModal + new profile-dropdown LoginForm hit real backend (role flows through, token stored, logout clears); footer visible on mobile with admin-only Administration link; profile avatar opens dropdown (info + links + sign out, or inline login) | OpenCode |
+| 2026-10-14 | Footer admin link removed per request; AdminPage gained Users tab (search + assign tenant/landlord/agent/admin, self-change locked, verified 200 live); Online admin = yes once deployed with VITE_API_URL + Neon DATABASE_URL (both already live locally) | OpenCode |
 | — | _Add next entry here_ | — |
 
 ## 7. How to Update This File

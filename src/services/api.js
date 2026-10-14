@@ -146,8 +146,7 @@ export const SettingsAPI = {
 export const AdminAPI = {
   integrations() {
     return http(`/admin/integrations`);
-  },
-  saveIntegration(provider, { enabled, config }) {
+  },  saveIntegration(provider, { enabled, config }) {
     return http(`/admin/integrations/${provider}`, {
       method: "PUT",
       body: JSON.stringify({ enabled, config }),
@@ -166,6 +165,16 @@ export const AdminAPI = {
     const fd = new FormData();
     fd.append("image", file);
     return httpForm(`/admin/uploads`, fd);
+  },
+  users({ q = "", page = 1 } = {}) {
+    const qs = new URLSearchParams({ ...(q ? { q } : {}), page });
+    return http(`/admin/users?${qs}`);
+  },
+  setUserRole(id, role) {
+    return http(`/admin/users/${id}/role`, {
+      method: "PUT",
+      body: JSON.stringify({ role }),
+    });
   },
 };
 
