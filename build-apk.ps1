@@ -1,4 +1,4 @@
-# MansaRent — reusable release APK build (Windows PowerShell)
+﻿# MansaRent - reusable release APK build (Windows PowerShell)
 # Usage: powershell -ExecutionPolicy Bypass -File .\build-apk.ps1
 # Prereqs (one-time, see product_status.md):
 #   1. Portable JDK 17+ in $env:USERPROFILE\.local\share\mansarent-android\jdk-17 (or set JAVA_HOME)
@@ -12,7 +12,7 @@ $env:Path = [System.Environment]::GetEnvironmentVariable("Path", "Machine") + ";
 # --- Locate Java ---
 if (-not $env:JAVA_HOME -or -not (Test-Path "$env:JAVA_HOME\bin\java.exe")) {
   $cand = Get-ChildItem "$env:USERPROFILE\.local\share\mansarent-android" -Directory -ErrorAction SilentlyContinue |
-    Where-Object { $_.Name -like "jdk*" } | Select-Object -First 1
+    Where-Object { $_.Name -like "jdk*" } | Sort-Object Name -Descending | Select-Object -First 1
   if ($cand) { $env:JAVA_HOME = $cand.FullName }
 }
 if (-not $env:JAVA_HOME) { throw "JAVA_HOME not set and no portable JDK found. Install Microsoft OpenJDK 17 (portable zip) into $env:USERPROFILE\.local\share\mansarent-android\jdk-17" }
@@ -28,18 +28,21 @@ $env:Path = "$env:ANDROID_HOME\platform-tools;$($bt.FullName);" + $env:Path
 
 # --- Keystore check (release signing) ---
 if (-not (Test-Path "android\keystore.properties")) {
-  throw "android\keystore.properties missing. Create it (storeFile/storePassword/keyAlias/keyPassword). It is gitignored — never commit it."
+  throw "android\keystore.properties missing. Create it (storeFile/storePassword/keyAlias/keyPassword). It is gitignored - never commit it."
 }
 
 # --- Build web + sync + assemble ---
 npm.cmd run build
 npx.cmd cap sync android
 Push-Location android
+$buildStart = Get-Date
 .\gradlew.bat assembleRelease
+if ($LASTEXITCODE -ne 0) { throw "assembleRelease failed (exit $LASTEXITCODE). Fix the error above - the APK was NOT rebuilt." }
 Pop-Location
 
 $apk = "android\app\build\outputs\apk\release\app-release.apk"
 if (-not (Test-Path $apk)) { throw "APK not produced at $apk" }
+if ((Get-Item $apk).LastWriteTime -lt $buildStart) { throw "APK at $apk is stale (older than this build start). The build did not produce a new APK." }
 
 # --- Verify ---
 $apksigner = Join-Path $bt.FullName "apksigner.bat"
